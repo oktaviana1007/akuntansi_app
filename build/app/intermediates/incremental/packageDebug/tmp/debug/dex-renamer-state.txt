@@ -1,4 +1,4 @@
-#Mon Sep 28 16:55:07 PDT 2020
+#Wed Nov 25 09:34:29 GMT-05:00 2020
 base.0=C\:\\Users\\Asus\\Documents\\AKUNTANSI\\akuntansi_app\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
 path.0=classes.dex
 renamed.0=classes.dex

@@ -16,7 +16,45 @@ class _BukuBesarState extends State<BukuBesar> {
   String year;
   String kira;
   setup() async {
-    month = "September";
+    var tgl = new DateTime.now();
+    var bln = tgl.month;
+    if (bln == 1) {
+      month = "January";
+    }
+    if (bln == 2) {
+      month = "February";
+    }
+    if (bln == 3) {
+      month = "March";
+    }
+    if (bln == 4) {
+      month = "April";
+    }
+    if (bln == 5) {
+      month = "May";
+    }
+    if (bln == 6) {
+      month = "June";
+    }
+    if (bln == 7) {
+      month = "July";
+    }
+    if (bln == 8) {
+      month = "August";
+    }
+    if (bln == 9) {
+      month = "September";
+    }
+    if (bln == 10) {
+      month = "October";
+    }
+    if (bln == 11) {
+      month = "November";
+    }
+    if (bln == 12) {
+      month = "December";
+    }
+    // month = "September";
     year = "2020";
     kira = "Kas";
   }
@@ -321,10 +359,14 @@ class _BukuBesarState extends State<BukuBesar> {
                             ])
                       ],
                     ),
-                    
                     FutureBuilder(
                       future: getData(month, year, kira),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done)
+                          return Center(child: CircularProgressIndicator());
+                        if (!snapshot.hasData || snapshot.data == null)
+                          return Container();
+                        if (snapshot.data.isEmpty) return Container();
                         if (snapshot.hasData) {
                           var a = snapshot.data['data'][month];
                           return SingleChildScrollView(
@@ -332,7 +374,8 @@ class _BukuBesarState extends State<BukuBesar> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               ListView.builder(
-                                  itemCount: a.length,
+                                  itemCount: a.length == null
+                              ? 0 : a.length,
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
                                     return Table(
@@ -358,8 +401,11 @@ class _BukuBesarState extends State<BukuBesar> {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Padding(
-                                                      padding: const EdgeInsets.all(8.0),
-                                                      child: Text((a[index]['tanggal']),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Text(
+                                                          (a[index]['tanggal']),
                                                           style: TextStyle(
                                                               fontFamily:
                                                                   "Product-Bold",
@@ -373,7 +419,9 @@ class _BukuBesarState extends State<BukuBesar> {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Padding(
-                                                      padding: const EdgeInsets.all(8.0),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
                                                       child: Text(
                                                           (a[index]
                                                               ['keterangan']),
@@ -387,47 +435,61 @@ class _BukuBesarState extends State<BukuBesar> {
                                                   ]),
                                               Column(children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.all(8.0),
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
                                                   child: Container(
-                                                    alignment: Alignment.bottomRight,
+                                                    alignment:
+                                                        Alignment.bottomRight,
                                                     child: Text(
-                                                        (a[index]['jenis'])
+                                                        (a[index][
+                                                                        'jenis'])
                                                                     .toString() ==
                                                                 "D"
-                                                            ? (a[index]['jumlah'])
+                                                            ? (a[index]
+                                                                    ['jumlah'])
                                                                 .toString()
                                                             : "0",
                                                         style: TextStyle(
                                                             fontFamily:
                                                                 "Product-Bold",
                                                             fontSize: 12,
-                                                            letterSpacing: 0.5)),
+                                                            letterSpacing:
+                                                                0.5)),
                                                   ),
                                                 )
                                               ]),
                                               Column(children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.only(right: 20.0, top: 8, bottom: 8),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 20.0,
+                                                          top: 8,
+                                                          bottom: 8),
                                                   child: Container(
-                                                    alignment: Alignment.bottomRight,
+                                                    alignment:
+                                                        Alignment.bottomRight,
                                                     child: Text(
-                                                        (a[index]['jenis'])
+                                                        (a[index][
+                                                                        'jenis'])
                                                                     .toString() ==
                                                                 "D"
                                                             ? "0"
-                                                            : (a[index]['jumlah'])
+                                                            : (a[index]
+                                                                    ['jumlah'])
                                                                 .toString(),
                                                         style: TextStyle(
                                                             fontFamily:
                                                                 "Product-Bold",
                                                             fontSize: 12,
-                                                            letterSpacing: 0.5)),
+                                                            letterSpacing:
+                                                                0.5)),
                                                   ),
                                                 )
                                               ]),
                                               Column(children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.all(8.0),
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
                                                   child: Text(
                                                       (a[index]['total'])
                                                           .toString(),
@@ -442,13 +504,13 @@ class _BukuBesarState extends State<BukuBesar> {
                                       ],
                                     );
                                   }),
-                                  Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-              indent: 0,
-              endIndent: 0,
-            ),
+                              Divider(
+                                height: 2,
+                                thickness: 1,
+                                color: Colors.black,
+                                indent: 0,
+                                endIndent: 0,
+                              ),
                               Table(
                                 border: TableBorder(
                                     horizontalInside: BorderSide(
@@ -473,12 +535,13 @@ class _BukuBesarState extends State<BukuBesar> {
                                             child: Container(
                                               // alignment: Alignment.topLeft,
                                               child: Text("Total",
-                                                  
-                                    style: TextStyle(
-                                        fontFamily: "Product-Bold",
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5)),
+                                                  style: TextStyle(
+                                                      fontFamily:
+                                                          "Product-Bold",
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      letterSpacing: 0.5)),
                                             ),
                                           ),
                                         ]),
@@ -491,11 +554,14 @@ class _BukuBesarState extends State<BukuBesar> {
                                           Column(
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.all(8.0),
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
                                                 child: Container(
-                                                  alignment: Alignment.bottomRight,
+                                                  alignment:
+                                                      Alignment.bottomRight,
                                                   child: Text(
-                                                      snapshot.data['totaldebit']
+                                                      snapshot
+                                                          .data['totaldebit']
                                                           .toString(),
                                                       style: TextStyle(
                                                           fontFamily:
@@ -511,11 +577,16 @@ class _BukuBesarState extends State<BukuBesar> {
                                           Column(
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.only(top: 8.0, bottom: 8, right: 20),
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0,
+                                                    bottom: 8,
+                                                    right: 20),
                                                 child: Container(
-                                                  alignment: Alignment.bottomRight,
+                                                  alignment:
+                                                      Alignment.bottomRight,
                                                   child: Text(
-                                                      snapshot.data['totalkredit']
+                                                      snapshot
+                                                          .data['totalkredit']
                                                           .toString(),
                                                       style: TextStyle(
                                                           fontFamily:

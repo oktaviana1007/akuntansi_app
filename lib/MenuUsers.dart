@@ -4,6 +4,7 @@ import 'package:akuntansi_app/Pengaturan.dart';
 import 'package:akuntansi_app/mainDrawer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MenuUsers extends StatefulWidget {
   final VoidCallback signOut;
@@ -52,38 +53,6 @@ class _MenuUsersState extends State<MenuUsers> {
                 child: Text("Tidak"),
               )
             ],
-            // child: ListView(
-            //   padding: EdgeInsets.all(16.0),
-            //   shrinkWrap: true,
-            //   children: <Widget>[
-            //     Text(
-            //       "Apakah Anda yakin untuk keluar dari Akun?",
-            //       style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-            //     ),
-            //     SizedBox(
-            //       height: 10.0,
-            //     ),
-            //     Row(
-            //       mainAxisAlignment: MainAxisAlignment.end,
-            //       children: <Widget>[
-            //         InkWell(
-            //             onTap: () {
-            //               Navigator.pop(context);
-            //             },
-            //             child: Text("Tidak")),
-            //         SizedBox(
-            //           width: 16.0,
-            //         ),
-            //         InkWell(
-            //             onTap: () {
-            //               widget.signOut();
-            //               Navigator.pop(context);
-            //             },
-            //             child: Text("Ya")),
-            //       ],
-            //     )
-            //   ],
-            // ),
           );
         });
   }
@@ -115,102 +84,188 @@ class _MenuUsersState extends State<MenuUsers> {
           ],
         ),
 
-      body: Center(
+    body: Container(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: InkWell(
-                            onTap: (){
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context)=>DataTransaksi(),
-                              ));
-                            },
-                            child: Container(
-                              color: Colors.black26,
-                              height: 100,
-                              width: 100,
-                              child: Center(child: Text('Jurnal')),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: InkWell(
-                            onTap: (){
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context)=>Pengaturan(),
-                              ));
-                            },
-                            child: Container(
-                              color: Colors.black26,
-                              height: 100,
-                              width: 100,
-                              child: Center(child: Text('Pengaturan')),
-                            ),
-                          ),
-                        ),
-                      ],
+          children: <Widget>[
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Text(
+                      "Ringkasan Bisnis",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20.0,
+                      ),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage('images/filter.png')),
+                      ),
+                      child: FlatButton(
+                        onPressed: (){
+                        }, child: null),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                top: 10.0, left: 20.0, right: 20.0, bottom: 10.0),
+              child: Container(
+                width: double.infinity,
+                height: ScreenUtil.getInstance().setHeight(300),
+                decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(5.0),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0.0, 4.0),
+                          blurRadius: 4.0),
+                      BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0.0, 4.0),
+                          blurRadius: 4.0),
+                    ]),
+                child: Stack(fit: StackFit.expand, children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(left: 20.0, top: 20.0),
+                    child: Text(
+                      "PEMASUKAN",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 60.0, bottom: 35.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.blue[200],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 60.0, bottom: 35.0, right: 300.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 80.0, left: 220.0),
+                    child: Text("RP.   0,00",
+                        style: TextStyle(color: Colors.white, fontSize: 22.0)),
+                  )
+                ]),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 10.0, left: 20.0, right: 20.0, bottom: 10.0),
+              child: Container(
+                width: double.infinity,
+                height: ScreenUtil.getInstance().setHeight(300),
+                decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(5.0),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0.0, 4.0),
+                          blurRadius: 4.0),
+                      BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0.0, 4.0),
+                          blurRadius: 4.0),
+                    ]),
+                child: Stack(fit: StackFit.expand, children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(left: 20.0, top: 20.0),
+                    child: Text(
+                      "PENGELUARAN",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 60.0, bottom: 35.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.green[200],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 60.0, bottom: 35.0, right: 300.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 80.0, left: 220.0),
+                    child: Text("RP.   0,00",
+                        style: TextStyle(color: Colors.white, fontSize: 22.0)),
+                  ),
+                ]),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 10.0, left: 20.0, right: 20.0, bottom: 10.0),
+              child: Container(
+                width: double.infinity,
+                height: ScreenUtil.getInstance().setHeight(300),
+                decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(5.0),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0.0, 4.0),
+                          blurRadius: 4.0),
+                      BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0.0, 4.0),
+                          blurRadius: 4.0),
+                    ]),
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Stack(fit: StackFit.expand, children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(left: 5.0),
+                      child: Text(
+                        "LABA RUGI",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18.0,
+                        ),
+                      ),
+                    ),
+                  ]),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: InkWell(
-
-                            child: Container(
-                              color: Colors.black26,
-                              height: 100,
-                              width: 100,
-                              child: Center(child: Text('menu 3')),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: InkWell(
-                            child: Container(
-                              color: Colors.black26,
-                              height: 100,
-                              width: 100,
-                              child: Center(child: Text('menu 4')),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-
-            )
-
+              ),
+            ),
           ],
         ),
-      )
-
+      ),
     );
   }
 }

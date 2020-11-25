@@ -14,9 +14,47 @@ class Neraca extends StatefulWidget {
 class NeracaState extends State<Neraca> {
   String month;
   String year;
-   setup() async{
-    month="September";
-    year= "2020";
+  setup() async {
+    var tgl = new DateTime.now();
+    var bln = tgl.month;
+    if (bln == 1) {
+      month = "January";
+    }
+    if (bln == 2) {
+      month = "February";
+    }
+    if (bln == 3) {
+      month = "March";
+    }
+    if (bln == 4) {
+      month = "April";
+    }
+    if (bln == 5) {
+      month = "May";
+    }
+    if (bln == 6) {
+      month = "June";
+    }
+    if (bln == 7) {
+      month = "July";
+    }
+    if (bln == 8) {
+      month = "August";
+    }
+    if (bln == 9) {
+      month = "September";
+    }
+    if (bln == 10) {
+      month = "October";
+    }
+    if (bln == 11) {
+      month = "November";
+    }
+    if (bln == 12) {
+      month = "December";
+    }
+    // month = "September";
+    year = "2020";
   }
 
    List listMonth= [
@@ -177,6 +215,12 @@ Future getData(String month, String year) async{
             FutureBuilder(
               future: getData(month,year),
               builder: (BuildContext context, AsyncSnapshot snapshot){
+                 if (snapshot.connectionState != ConnectionState.done)
+                    return Center(child: CircularProgressIndicator());
+                  if (!snapshot.hasData || snapshot.data == null)
+                    return Container();
+                  if (snapshot.data.isEmpty)
+                    return Container();
                 if(snapshot.hasData){
                   a=snapshot.data[month];
                   return SingleChildScrollView(

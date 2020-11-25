@@ -3,6 +3,7 @@ import 'package:akuntansi_app/API.dart';
 import 'package:akuntansi_app/DataTransaksi.dart';
 import 'package:akuntansi_app/Pengaturan.dart';
 import 'package:akuntansi_app/custom/datepicker.dart';
+import 'package:akuntansi_app/model/jenisTransaksi.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -10,8 +11,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TambahDataTransaksi extends StatefulWidget {
-  // final VoidCallback reload;
-  // TambahDataTransaksi(this.reload);
   @override
   _TambahDataTransaksiState createState() => _TambahDataTransaksiState();
 }
@@ -26,8 +25,7 @@ class _TambahDataTransaksiState extends State<TambahDataTransaksi> {
   final key =
       'GEkOo6sFgqDia4EfVarRMu73Vh6d5qwMfl5XtXn6sD3OiuKEXIZ7wIQ2C1tKFQUBpGDBIDGtsiLCedHN';
   int _valJenis, _valKredi, _valPerki;
-  int nominali = 30000;
-  // int coba;
+
   List<dynamic> _dataJenis = List();
   List<dynamic> _dataPerki = List();
   List<dynamic> _dataKredi = List();
@@ -43,6 +41,24 @@ class _TambahDataTransaksiState extends State<TambahDataTransaksi> {
     });
     // print(idUsers);
   }
+
+  // List<JenisTransaksi> listModel = [];
+  // Future<Null> getData() async {
+  //   final responseData = await http.get(baseUrl, headers: {
+  //     'Accept': 'application/json',
+  //     'Authorization': 'Bearer $key'
+  //   });
+  //   if (responseData.statusCode == 200) {
+  //     final data = jsonDecode(responseData.body);
+  //     print("data : $data");
+  //     // return data;
+  //     setState(() {
+  //       for (Map i in data["data"]) {
+  //         listModel.add(JenisTransaksi.fromJson(i));
+  //       }
+  //     });
+  //   }
+  // }
 
   void getJenis() async {
     await http.get(baseUrl, headers: {
@@ -142,6 +158,7 @@ class _TambahDataTransaksiState extends State<TambahDataTransaksi> {
       });
     } else {
       print(data);
+      print(response.statusCode);
       tampilToast("Data GAGAL Ditambahkan");
     }
   }
@@ -160,8 +177,10 @@ class _TambahDataTransaksiState extends State<TambahDataTransaksi> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _valJenis = 1;
     getJenis();
     getPref();
+    // getData();
   }
 
   @override
@@ -276,6 +295,32 @@ class _TambahDataTransaksiState extends State<TambahDataTransaksi> {
                             indent: 0,
                             endIndent: 0,
                           ),
+                          // Padding(
+                          //   padding: const EdgeInsets.only(top: 3.0, left: 6),
+                          //   child: ListView.builder(
+                          //       itemCount: listModel.length,
+                          //       shrinkWrap: true,
+                          //       itemBuilder: (context, index) {
+                          //         final nDataList = listModel[index];
+                          //         if (_valJenis == null) {
+                          //           Text("data");
+                          //         } else {
+                          //           if (_valJenis == nDataList.data) {
+                          //             return ListTile(
+                          //                 title: Text(
+                          //               "${nDataList.data}",
+                          //               style: TextStyle(
+                          //                 color: Colors.black38,
+                          //                 fontSize: 13.0,
+                          //               ),
+                          //             ));
+                          //           } else{
+                          //             print("gagal");
+                          //             return Container();
+                          //           }
+                          //         }
+                          //       }),
+                          // ),
                           Padding(
                             padding: const EdgeInsets.only(top: 10.0, left: 20),
                             child: Text(
@@ -429,7 +474,8 @@ class _TambahDataTransaksiState extends State<TambahDataTransaksi> {
                             endIndent: 0,
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left: 100.0, top: 30),
+                            padding:
+                                const EdgeInsets.only(left: 100.0, top: 30),
                             child: Container(
                               height: 50,
                               width: 150,

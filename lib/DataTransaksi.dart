@@ -4,9 +4,9 @@ import 'package:akuntansi_app/DetailTransaksi.dart';
 import 'package:akuntansi_app/TambahDataTransaksi.dart';
 import 'package:akuntansi_app/mainDrawer.dart';
 import 'package:akuntansi_app/model/data.dart';
-import 'package:flutter/foundation.dart';
+import 'package:akuntansi_app/transaksiBuku.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,7 +19,45 @@ class _DataTransaksiState extends State<DataTransaksi> {
   String month;
   String year;
   setup() async {
-    month = "September";
+    var tgl = new DateTime.now();
+    var bln = tgl.month;
+    if (bln == 1) {
+      month = "January";
+    }
+    if (bln == 2) {
+      month = "February";
+    }
+    if (bln == 3) {
+      month = "March";
+    }
+    if (bln == 4) {
+      month = "April";
+    }
+    if (bln == 5) {
+      month = "May";
+    }
+    if (bln == 6) {
+      month = "June";
+    }
+    if (bln == 7) {
+      month = "July";
+    }
+    if (bln == 8) {
+      month = "August";
+    }
+    if (bln == 9) {
+      month = "September";
+    }
+    if (bln == 10) {
+      month = "October";
+    }
+    if (bln == 11) {
+      month = "November";
+    }
+    if (bln == 12) {
+      month = "December";
+    }
+    // month = "September";
     year = "2020";
   }
 
@@ -33,9 +71,9 @@ class _DataTransaksiState extends State<DataTransaksi> {
     "July",
     "August",
     "September",
-    "Oktober",
+    "October",
     "November",
-    "Desember"
+    "December"
   ];
 
   List listYear = ["2018", "2019", "2020"];
@@ -48,14 +86,14 @@ class _DataTransaksiState extends State<DataTransaksi> {
     });
 
     setup();
-    _lihatData();
   }
 
   var loading = false;
-  final GlobalKey<RefreshIndicatorState> _refresh =
-      GlobalKey<RefreshIndicatorState>();
+  // final GlobalKey<RefreshIndicatorState> _refresh =
+  //     GlobalKey<RefreshIndicatorState>();
   List<Datas> _list = [];
-  var _search;
+  List<Datas> _search = [];
+
   Future<List<Datas>> _lihatData() async {
     _list.clear();
     final response = await http.post(BaseUrl.APIdataTransaksi, headers: {
@@ -68,42 +106,44 @@ class _DataTransaksiState extends State<DataTransaksi> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       for (var i in data) {
-        Datas dat = Datas(i["tanggal"], i["keterangan"], i["jumlah"],
-            i["perkiraan1"], i["perkiraan2"]);
+        Datas dat = Datas(
+            i["tanggal"],
+            i["keterangan"],
+            i["jumlah"],
+            i["perkiraan1"],
+            i["perkiraan2"],
+            i["id_transaksi"],
+            i["jenis_transaksi"],
+            i["perkiraan1_id"],
+            i["perkiraan2_id"],
+            i["jenis_transaksi_id"]);
         _list.add(dat);
       }
       print(_list.length);
       return _list;
     }
-    // _list = json.decode(response.body);
-    // print(response.statusCode);
-    // return jsonData;
   }
 
-// TextEditingController controller = new TextEditingController();
+  TextEditingController controller = new TextEditingController();
 
-//   onSearch(String text) async {
-//     _search.clear();
-//     if (text.isEmpty) {
-//       setState(() {});
-//       return;
-//     }
+  onSearch(String text) async {
+    _search.clear();
+    if (text.isEmpty) {
+      setState(() {});
+      return;
+    }
 
-//     list.forEach((f) {
-//       if (f.title.contains(text) || f.id.toString().contains(text))
-//         _search.add(f);
-//     });
+    _list.forEach((f) {
+      if (f.keterangan.contains(text)) _search.add(f);
+    });
 
-//     setState(() {});
-//   }
+    setState(() {});
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // setState(() {
-    //   _lihatData();
-    // });
     getPref();
   }
 
@@ -116,21 +156,44 @@ class _DataTransaksiState extends State<DataTransaksi> {
         backgroundColor: Colors.blue,
       ),
       drawer: MainDrawer(),
-      floatingActionButton: InkWell(
-        onTap: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => TambahDataTransaksi()));
-        },
-        child: Container(
-          padding: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(40), color: Colors.blue),
-          child: Icon(
-            Icons.add,
-            color: Colors.white,
-            size: 25,
+      floatingActionButton: SpeedDial(
+        curve: Curves.bounceOut,
+        animatedIcon: AnimatedIcons.menu_close,
+        overlayColor: Colors.black12,
+        backgroundColor: Colors.blue,
+        children: [
+          SpeedDialChild(
+              child: Icon(
+                Icons.book,
+                color: Colors.black,
+              ),
+              backgroundColor: Colors.white,
+              label: "Dengan Pembukuan",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TransaksiBuku(),
+                  ),
+                );
+              }),
+          SpeedDialChild(
+            child: Icon(
+              Icons.bookmark,
+              color: Colors.black,
+            ),
+            backgroundColor: Colors.white,
+            label: "Langsung",
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TambahDataTransaksi(),
+                ),
+              );
+            },
           ),
-        ),
+        ],
       ),
       body: loading
           ? Center(
@@ -150,8 +213,8 @@ class _DataTransaksiState extends State<DataTransaksi> {
                         child: Container(
                           padding: EdgeInsets.only(left: 12.0, right: 12.0),
                           decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Colors.black38, width: 1.0),
+                              border:
+                                  Border.all(color: Colors.black38, width: 1.0),
                               borderRadius: BorderRadius.circular(5.0)),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton(
@@ -173,8 +236,7 @@ class _DataTransaksiState extends State<DataTransaksi> {
                         ),
                       ),
                       Padding(
-                        padding:
-                            const EdgeInsets.only(top: 12.0, right: 40.0),
+                        padding: const EdgeInsets.only(top: 12.0, right: 40.0),
                         child: Container(
                           padding: EdgeInsets.only(right: 12.0, left: 12.0),
                           decoration: BoxDecoration(
@@ -223,6 +285,8 @@ class _DataTransaksiState extends State<DataTransaksi> {
                               blurRadius: 4.0),
                         ]),
                     child: TextField(
+                      controller: controller,
+                      onChanged: onSearch,
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
                         labelStyle:
@@ -244,38 +308,26 @@ class _DataTransaksiState extends State<DataTransaksi> {
                   ),
                 ),
                 Expanded(
-                  child: FutureBuilder(
-                    future: _lihatData(),
-                    builder: (context, snapshot) {
-                      print(snapshot.data);
-                      if (snapshot.data == null) {
-                        return Container(
-                          child: Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      } else {
-                        return ListView.builder(
-                          itemCount: snapshot.data == null
-                              ? 0
-                              : snapshot.data.length,
+                  child: _search.length != 0 || controller.text.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: _search.length,
                           itemBuilder: (context, i) {
-                            final c = snapshot.data;
+                            final c = _search[i];
                             return new Container(
                               padding: const EdgeInsets.all(5.0),
                               child: new GestureDetector(
-                                onTap: () => Navigator.push(
-                                    context,
-                                    new MaterialPageRoute(
-                                        builder: (context) =>
-                                            DetailTransaksi(c[i]))),
+                                // onTap: () => Navigator.push(
+                                //     context,
+                                //     new MaterialPageRoute(
+                                //         builder: (context) =>
+                                //             DetailTransaksi(c[i]))),
                                 child: new Card(
                                   elevation: 2.0,
                                   child: Container(
                                     width: double.infinity,
                                     height: 75,
                                     decoration: BoxDecoration(
-                                          color: Colors.white,
+                                        color: Colors.white,
                                         borderRadius:
                                             BorderRadius.circular(5.0),
                                         boxShadow: [
@@ -293,19 +345,19 @@ class _DataTransaksiState extends State<DataTransaksi> {
                                       children: <Widget>[
                                         ListTile(
                                           title: new Text(
-                                            c[i].keterangan,
+                                            c.keterangan,
                                             style: TextStyle(fontSize: 17),
                                           ),
                                           trailing: Padding(
                                             padding: const EdgeInsets.only(
                                                 top: 35.0),
                                             child: new Text(
-                                              c[i].jumlah.toString(),
+                                              c.jumlah.toString(),
                                               style: TextStyle(fontSize: 20),
                                             ),
                                           ),
                                           subtitle: new Text(
-                                            c[i].tanggal.toString(),
+                                            c.tanggal.toString(),
                                             style: TextStyle(fontSize: 12),
                                           ),
                                         ),
@@ -316,10 +368,94 @@ class _DataTransaksiState extends State<DataTransaksi> {
                               ),
                             );
                           },
-                        );
-                      }
-                    },
-                  ),
+                        )
+                      : FutureBuilder(
+                          future: _lihatData(),
+                          builder: (context, snapshot) {
+                            print(snapshot.data);
+                            if (snapshot.data == null) {
+                              return Container(
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            } else {
+                              return ListView.builder(
+                                itemCount: snapshot.data == null
+                                    ? 0
+                                    : snapshot.data.length,
+                                itemBuilder: (context, i) {
+                                  final c = snapshot.data;
+                                  return new Container(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: new GestureDetector(
+                                      onTap: () => Navigator.push(
+                                          context,
+                                          new MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetailTransaksi(c[i]))),
+                                      child: new Card(
+                                        elevation: 2.0,
+                                        child: Container(
+                                          width: double.infinity,
+                                          height: 75,
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(5.0),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.black12,
+                                                    offset: Offset(0.0, 4.0),
+                                                    blurRadius: 4.0),
+                                                BoxShadow(
+                                                    color: Colors.black12,
+                                                    offset: Offset(0.0, 4.0),
+                                                    blurRadius: 4.0),
+                                              ]),
+                                          child: Stack(
+                                            fit: StackFit.expand,
+                                            children: <Widget>[
+                                              ListTile(
+                                                title: new Text(
+                                                  c[i].keterangan,
+                                                  style:
+                                                      TextStyle(fontSize: 17),
+                                                ),
+                                                trailing: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 35.0),
+                                                  child: new Text(
+                                                    c[i].jumlah.toString(),
+                                                    style:
+                                                        TextStyle(fontSize: 20),
+                                                  ),
+                                                ),
+                                                subtitle: new Text(
+                                                  c[i].tanggal.toString(),
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                ),
+                                                leading: Container(
+                                                  width: 20,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.green
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          },
+                        ),
                 )
               ],
             ),

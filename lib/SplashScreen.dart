@@ -36,13 +36,13 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Image.asset(
-              'images/logoasli.png',
+              'images/logosaku.png',
               width: 300.0,
               height: 100.0,
             ),
             Padding(
               padding: const EdgeInsets.only(top: 30.0),
-              child: Text('AKUNTANSI UMKM', style: TextStyle(fontStyle: FontStyle.normal , color: Colors.black, fontSize: 25, ),),
+              child: Text('Solusi Akuntansi UMKM', style: TextStyle(fontStyle: FontStyle.normal , color: Colors.black, fontSize: 25, ),),
             ),
           ],
         ),

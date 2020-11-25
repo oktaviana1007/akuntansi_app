@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:akuntansi_app/API.dart';
 // import 'package:akuntansi_app/MenuAdmin.dart';
 import 'package:akuntansi_app/MenuUsers.dart';
+import 'package:akuntansi_app/profil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -47,10 +48,10 @@ class _LoginPageState extends State<LoginPage> {
         .post(BaseUrl.login, body: {"email": email, "password": password});
     final data = jsonDecode(response.body);
     print("data: $data");
-    String id = data['id'];
-    String name = data['name'];
+    int id = data['data']['id'];
+    String name = data['data']['name'];
     String emailAPI = data['email'];
-    // String namaPerusahaan = data['nama_perusahaan'];
+    String nama_perusahaan = data['data']['nama_perusahaan'];
     // String alamatPerusahaan = data['alamat_perusahaan'];
     // String teleponPerusahaan = data['telepon_perusahaan'];
     // String emailPerusahaan = data['email_perusahaan'];
@@ -59,26 +60,26 @@ class _LoginPageState extends State<LoginPage> {
     if (success == true) {
       setState(() {
         _loginStatus = LoginStatus.signIn;
-        savePref(id, name, emailAPI, success, token);
+        savePref(id, name, emailAPI, success, token, nama_perusahaan);
       });
       print("pesan");
       loginToast("LOGIN BERHASIL");
-    } else {
+    } if (success == false) {
       print("gatot");
-      loginToast("LOGIN GAGAL");
+      loginToast("Username/password tidak cocok");
     }
   }
 
   savePref(
-      String id, String name, String email, bool success, String token) async {
+      int id, String name, String email, bool success, String token, String nama_perusahaan) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      preferences.setString("id", id);
+      preferences.setInt("id", id);
       preferences.setString("name", name);
       preferences.setString("email", email);
       preferences.setBool("success", success);
       preferences.setString("token", token);
-      // preferences.setString("nama_perusahaan", namaPerusahaan);
+      preferences.setString("nama_perusahaan", nama_perusahaan);
       // preferences.setString("alamat_perusahaan", alamatPerusahaan);
       // preferences.setString("telepon_perusahaan", teleponPerusahaan);
       // preferences.setString("email_perusahaan", emailPerusahaan);
@@ -359,6 +360,7 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   String name, email, namap, alamatp, teleponp, emailp, password;
   final _key = new GlobalKey<FormState>();
+
 
   bool _secureText = true;
 

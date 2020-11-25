@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:akuntansi_app/API.dart';
 import 'package:akuntansi_app/DataTransaksi.dart';
 import 'package:akuntansi_app/model/data.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:akuntansi_app/EditDataTransaksi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailTransaksi extends StatefulWidget {
   // final jenisTransaksiModel model;
@@ -24,11 +28,20 @@ enum MenuOption { Ubah, Hapus }
 
 class _DetailTransaksiState extends State<DetailTransaksi> {
   // final _key = new GlobalKey<FormState>();
+  String token;
+
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      token = preferences.getString("token");
+    });
+    print(token);
+  }
 
   void confirm() {
     AlertDialog alertDialog = new AlertDialog(
-      content: new Text(
-          "Are You sure want to delete '${widget.list.keterangan}'"),
+      content:
+          new Text("Are You sure want to delete '${widget.list.keterangan}'"),
       actions: <Widget>[
         new RaisedButton(
             child: new Text(
@@ -37,7 +50,7 @@ class _DetailTransaksiState extends State<DetailTransaksi> {
             ),
             color: Colors.red,
             onPressed: () {
-              // deleteData();
+              deleteData();
               Navigator.of(context).push(new MaterialPageRoute(
                 builder: (BuildContext context) => new DataTransaksi(),
               ));
@@ -53,78 +66,54 @@ class _DetailTransaksiState extends State<DetailTransaksi> {
       ],
     );
     showDialog(context: context, child: alertDialog);
-    // showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return Dialog(
-    //         child: ListView(
-    //           padding: EdgeInsets.all(16.0),
-    //           shrinkWrap: true,
-    //           children: <Widget>[
-    //             Text(
-    //               "Anda yakin ingin menghapus data ini?",
-    //               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-    //             ),
-    //             SizedBox(
-    //               height: 10.0,
-    //             ),
-    //             Row(
-    //               mainAxisAlignment: MainAxisAlignment.end,
-    //               children: <Widget>[
-    //                 InkWell(
-    //                     onTap: () {
-    //                       Navigator.pop(context);
-    //                     },
-    //                     child: Text("Tidak")),
-    //                 SizedBox(
-    //                   width: 16.0,
-    //                 ),
-    //                 InkWell(
-    //                     onTap: () {
-    //                       deleteData();
-    //                       Navigator.of(context).push(new MaterialPageRoute(
-    //                         builder: (BuildContext context) =>
-    //                             new DataTransaksi(),
-    //                       ));
-    //                     },
-    //                     child: Text("Ya")),
-    //               ],
-    //             )
-    //           ],
-    //         ),
-    //       );
-    //     });
   }
 
-  // void deleteData() {
-  //   http.post(BaseUrl.APIdeleteDataTransaksi,
-  //       body: {'id': widget.list.keterangan}
-  //   final data = jsonDecode(response.body);
-  //   int value = data['value'];
-  //   if (value == 1) {
-  //     setState(() {
-  //       Navigator.pop(context);
-  //       _lihatData();
-  //       tampilToast("Berhasil dihapus");
-  //     });
-  //   } else {
-  //     tampilToast("Gagal dihapus");
-  //   }
-  // }
+  void deleteData() async {
+     var response = await http.post(BaseUrl.APIhapusDataTransaksi, headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token'
+    }, body: {
+      'id': widget.list.id_transaksi.toString()
+    }
+        );
+        final data = jsonDecode(response.body);
+        bool value = data['success'];
+        String message = data['message'];
+        if (value == true ) {
+          setState(() {
+            print(data);
+            // print(token);
+            // Navigator.pop(context);
+            // _lihatData();
+            tampilToast(message);
+          });
+        } else {
+            // print(token);
+          print("Gagal dihapus");
+        }
+  }
+
+   tampilToast(String toast) {
+    return Fluttertoast.showToast(
+        msg: toast,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIos: 1,
+        backgroundColor: Colors.blue,
+        textColor: Colors.white);
+  }
 
   TextEditingController txtjenisTransaksi,
       txtpilihan1,
       txtpilihan2,
       txtketerangan;
   setup() async {
+
     txtjenisTransaksi =
-        TextEditingController(text: widget.list.keterangan);
-    txtpilihan1 =
-        TextEditingController(text: widget.list.perkiraan1);
-    txtpilihan2 =
-        TextEditingController(text: widget.list.perkiraan2);
-    txtketerangan =
-        TextEditingController(text: widget.list.keterangan);
+        TextEditingController(text: widget.list.jenis_transaksi);
+    txtpilihan1 = TextEditingController(text: widget.list.perkiraan1);
+    txtpilihan2 = TextEditingController(text: widget.list.perkiraan2);
+    txtketerangan = TextEditingController(text: widget.list.keterangan);
   }
 
   // var _autovalidate = false;
@@ -133,7 +122,9 @@ class _DetailTransaksiState extends State<DetailTransaksi> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getPref();
     setup();
+    print(widget.list.id_transaksi);
   }
 
   @override
@@ -203,8 +194,8 @@ class _DetailTransaksiState extends State<DetailTransaksi> {
                             children: [
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 5.0, top: 18),
+                                  padding:
+                                      const EdgeInsets.only(left: 5.0, top: 18),
                                   child: Text(
                                     "Nominal",
                                     style: TextStyle(
@@ -222,8 +213,7 @@ class _DetailTransaksiState extends State<DetailTransaksi> {
                               Padding(
                                 padding: const EdgeInsets.all(5.0),
                                 child: Text(
-                                  widget.list.jumlah
-                                      .toString(),
+                                  widget.list.jumlah.toString(),
                                   style: TextStyle(fontSize: 35),
                                 ),
                               )

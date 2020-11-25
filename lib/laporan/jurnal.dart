@@ -14,7 +14,45 @@ class _JurnalState extends State<Jurnal> {
   String month;
   String year;
   setup() async {
-    month = "September";
+    var tgl = new DateTime.now();
+    var bln = tgl.month;
+    if (bln == 1) {
+      month = "January";
+    }
+    if (bln == 2) {
+      month = "February";
+    }
+    if (bln == 3) {
+      month = "March";
+    }
+    if (bln == 4) {
+      month = "April";
+    }
+    if (bln == 5) {
+      month = "May";
+    }
+    if (bln == 6) {
+      month = "June";
+    }
+    if (bln == 7) {
+      month = "July";
+    }
+    if (bln == 8) {
+      month = "August";
+    }
+    if (bln == 9) {
+      month = "September";
+    }
+    if (bln == 10) {
+      month = "October";
+    }
+    if (bln == 11) {
+      month = "November";
+    }
+    if (bln == 12) {
+      month = "December";
+    }
+    // month = "September";
     year = "2020";
   }
 
@@ -38,19 +76,15 @@ class _JurnalState extends State<Jurnal> {
     "August",
     "September",
     "October",
-    "November",
+    "November", 
     "December"
   ];
 
   List listYear = ["2018", "2019", "2020"];
-
-  var a;
+  var loading = false;
+  // var a;
   var b;
-  Future getData(String month, String year) async {
-    // final prefs = await SharedPreferences.getInstance();
-    //   final key = 'api_token';
-    //   final value = prefs.get(key) ?? 0;
-    //   print(value);
+  Future getData() async {
     String apiURL = "http://34.87.189.146:8000/api/report/jurnal/view";
     var data = await http.post(apiURL, headers: {
       'Accept': 'application/json',
@@ -71,7 +105,7 @@ class _JurnalState extends State<Jurnal> {
     super.initState;
     setup();
     setState(() {
-      getData(month, year);
+      getData();
     });
     getPref();
   }
@@ -83,157 +117,178 @@ class _JurnalState extends State<Jurnal> {
         title: Text("Laporan Jurnal"),
         centerTitle: true,
       ),
-      body: Container(
-        padding: EdgeInsets.only(left: 10, right: 10),
-        child: ListView(
-          children: <Widget>[
-            Container(
-              child: FittedBox(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(top: 12.0,left: 30),
-                      child: Container(
-                        padding: EdgeInsets.only(right: 20.0, left: 20.0),
-                        decoration: BoxDecoration(
-                          border:
-                              Border.all(color: Colors.black38, width: 1.0),
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                            hint: Text("Pilih Bulan"),
-                            value: month,
-                            items: listMonth.map((value) {
-                              return DropdownMenuItem(
-                                child: Text(value),
-                                value: value,
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                this.month = value;
-                              });
-                            },
+      body: loading ? Center(
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[Text('Belum ada transaksi yang dibuat :)')],
+            ))
+          : SingleChildScrollView(
+              child: Container(
+          // padding: EdgeInsets.only(left: 10, right: 10),
+          child: Column(
+            children: <Widget>[
+              Container(
+                child: FittedBox(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(top: 12.0,left: 30),
+                        child: Container(
+                          padding: EdgeInsets.only(right: 20.0, left: 20.0),
+                          decoration: BoxDecoration(
+                            border:
+                                Border.all(color: Colors.black38, width: 1.0),
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                              hint: Text("Pilih Bulan"),
+                              value: month,
+                              items: listMonth.map((value) {
+                                return DropdownMenuItem(
+                                  child: Text(value),
+                                  value: value,
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  this.month = value;
+                                });
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(top: 12.0, right: 30.0, left: 10, bottom: 10),
-                      child: Container(
-                        padding: EdgeInsets.only(right: 20.0, left: 20.0),
-                        decoration: BoxDecoration(
-                          border:
-                              Border.all(color: Colors.black38, width: 1.0),
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                            hint: Text("Pilih Tahun"),
-                            value: year,
-                            items: listYear.map((value) {
-                              return DropdownMenuItem(
-                                child: Text(value),
-                                value: value,
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                year = value;
-                              });
-                            },
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(top: 12.0, right: 30.0, left: 10, bottom: 10),
+                        child: Container(
+                          padding: EdgeInsets.only(right: 20.0, left: 20.0),
+                          decoration: BoxDecoration(
+                            border:
+                                Border.all(color: Colors.black38, width: 1.0),
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                              hint: Text("Pilih Tahun"),
+                              value: year,
+                              items: listYear.map((value) {
+                                return DropdownMenuItem(
+                                  child: Text(value),
+                                  value: value,
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  year = value;
+                                });
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Table(
-              border: TableBorder(
-                  horizontalInside: BorderSide(
-                      width: 0.5,
-                      color: Colors.black,
-                      style: BorderStyle.solid)),
-              columnWidths: {
-                0: FixedColumnWidth(50),
-                1: FixedColumnWidth(115),
-                2: FixedColumnWidth(60),
-                3: FixedColumnWidth(15)
-              },
-              children: [
-                TableRow(
-                    decoration: BoxDecoration(color: Colors.grey[200]),
-                    children: [
-                      Column(children: [
-                        Container(
-                          padding: EdgeInsets.all(7),
-                        ),
-                        Text("Tanggal",
-                            style: TextStyle(
-                                fontFamily: "Product-Bold",
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5)),
-                        Container(
-                          padding: EdgeInsets.all(7),
-                        )
-                      ]),
-                      Column(children: [
-                        Container(
-                          padding: EdgeInsets.all(7),
-                        ),
-                        Text("Keterangan",
-                            style: TextStyle(
-                                fontFamily: "Product-Bold",
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5))
-                      ]),
-                      Column(children: [
-                        Container(
-                          padding: EdgeInsets.all(7),
-                        ),
-                        Text("Debit",
-                            style: TextStyle(
-                                fontFamily: "Product-Bold",
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5))
-                      ]),
-                      Column(children: [
-                        Container(
-                          padding: EdgeInsets.all(7),
-                        ),
-                        Text("Kredit",
-                            style: TextStyle(
-                                fontFamily: "Product-Bold",
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5))
-                      ]),
-                    ])
-              ],
-            ),
-            FutureBuilder(
-              future: getData(month, year),
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.hasData) {
-                  a = snapshot.data['data'][month];
-                  return SingleChildScrollView(
-                    child: Column(
+              Table(
+                border: TableBorder(
+                    horizontalInside: BorderSide(
+                        width: 0.5,
+                        color: Colors.black,
+                        style: BorderStyle.solid)),
+                columnWidths: {
+                  0: FixedColumnWidth(60),
+                  1: FixedColumnWidth(170),
+                  2: FixedColumnWidth(70),
+                  3: FixedColumnWidth(65)
+                },
+                children: [
+                  TableRow(
+                      decoration: BoxDecoration(color: Colors.grey[200]),
+                      children: [
+                        Column(children: [
+                          Container(
+                            padding: EdgeInsets.all(7),
+                          ),
+                          Text("Tanggal",
+                              style: TextStyle(
+                                  fontFamily: "Product-Bold",
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5)),
+                          Container(
+                            padding: EdgeInsets.all(7),
+                          )
+                        ]),
+                        Column(children: [
+                          Container(
+                            padding: EdgeInsets.all(7),
+                          ),
+                          Text("Keterangan",
+                              style: TextStyle(
+                                  fontFamily: "Product-Bold",
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5))
+                        ]),
+                        Column(children: [
+                          Container(
+                            padding: EdgeInsets.all(7),
+                          ),
+                          Text("Debit",
+                              style: TextStyle(
+                                  fontFamily: "Product-Bold",
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5))
+                        ]),
+                        Column(children: [
+                          Container(
+                            padding: EdgeInsets.all(7),
+                          ),
+                          Text("Kredit",
+                              style: TextStyle(
+                                  fontFamily: "Product-Bold",
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5))
+                        ]),
+                      ])
+                ],
+              ),
+              FutureBuilder(
+                future: getData(),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  
+                  // final a = snapshot.data['data'][month];
+                  if (snapshot.connectionState != ConnectionState.done)
+                    return Center(child: CircularProgressIndicator());
+                  if (!snapshot.hasData || snapshot.data == null)
+                    return Container();
+                  if (snapshot.data.isEmpty)
+                    return Container();
+                    
+                  if (snapshot.hasData) {
+                    final a = snapshot.data['data'];
+                    if(a == null){
+                      return Container();
+                    }else{
+                      final a = snapshot.data['data'][month];
+                      return Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          itemCount: a.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          // scrollDirection: Axis.vertical,
+                          itemCount: a.length == null
+                              ? 0 : a.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
+                            // final a = snapshot.data['data'][month];
                             return Table(
                               border: TableBorder(
                                   horizontalInside: BorderSide(
@@ -243,7 +298,7 @@ class _JurnalState extends State<Jurnal> {
                               columnWidths: {
                                 0: FixedColumnWidth(80),
                                 1: FixedColumnWidth(150),
-                                2: FixedColumnWidth(60),
+                                2: FixedColumnWidth(65),
                                 3: FixedColumnWidth(60)
                               },
                               children: [
@@ -266,7 +321,7 @@ class _JurnalState extends State<Jurnal> {
                                             ),
                                             Text(
                                                 (a[index]['nama_transaksi'])
-                                                    .toString(),
+                                                    .toString(), textAlign: TextAlign.left,
                                                 style: TextStyle(
                                                     fontFamily: "Product-Bold",
                                                     fontSize: 13,
@@ -296,13 +351,16 @@ class _JurnalState extends State<Jurnal> {
                                     Container(
                                       padding: EdgeInsets.all(7),
                                     ),
-                                    Text(
-                                        (a[index]['jurnal_detail'][1]
-                                            ['perkiraan']),
-                                        style: TextStyle(
-                                            fontFamily: "Product-Bold",
-                                            fontSize: 13,
-                                            letterSpacing: 0.5)),
+                                    Container(
+                                      alignment: Alignment.topLeft,
+                                      child: Text(
+                                          (a[index]['jurnal_detail'][1]
+                                              ['perkiraan']),
+                                          style: TextStyle(
+                                              fontFamily: "Product-Bold",
+                                              fontSize: 13,
+                                              letterSpacing: 0.5)),
+                                    ),
                                     Container(
                                       padding: EdgeInsets.all(7),
                                     )
@@ -354,13 +412,17 @@ class _JurnalState extends State<Jurnal> {
                                     Container(
                                       padding: EdgeInsets.all(7),
                                     ),
-                                    Text(
-                                        (a[index]['jurnal_detail'][0]
-                                            ['perkiraan']),
-                                        style: TextStyle(
-                                            fontFamily: "Product-Bold",
-                                            fontSize: 13,
-                                            letterSpacing: 0.5)),
+                                    Container(
+                                      
+                                      alignment: Alignment.topLeft,
+                                      child: Text(
+                                          (a[index]['jurnal_detail'][0]
+                                              ['perkiraan']),
+                                          style: TextStyle(
+                                              fontFamily: "Product-Bold",
+                                              fontSize: 13,
+                                              letterSpacing: 0.5)),
+                                    ),
                                     Container(
                                       padding: EdgeInsets.all(7),
                                     ),
@@ -472,14 +534,16 @@ class _JurnalState extends State<Jurnal> {
                           ],
                         ),
                       ],
-                    ),
-                  );
-                } else {
-                  return Center(child: CircularProgressIndicator());
-                }
-              },
-            )
-          ],
+                    );
+                    }
+                    
+                  }{
+                    
+                  } 
+                  }
+              )
+            ],
+          ),
         ),
       ),
     );
