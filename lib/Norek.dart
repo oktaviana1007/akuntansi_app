@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:akuntansi_app/API.dart';
-import 'package:akuntansi_app/model/rekeningModel.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,7 +40,7 @@ class _NorekState extends State<Norek> {
 
   Future getData() async {
     // List<Data> list;
-    String link = "http://34.87.189.146:8000/api/rekening/";
+    String link = "http://34.87.189.146:8000/api/perkiraan/";
     var res = await http.get(Uri.encodeFull(link), headers: {
       'Accept': 'application/json',
       'Authorization': 'Bearer $token'
@@ -73,7 +71,7 @@ class _NorekState extends State<Norek> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomPadding: false,
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text(
             'No Rekening',
@@ -90,7 +88,7 @@ class _NorekState extends State<Norek> {
               return Container();
             if (snapshot.data.isEmpty) return Container();
             if (snapshot.hasData){
-                final c = snapshot.data['data'];
+                final c = snapshot.data;
               if (c == null) {
                   return Container(
                   child: Center(
@@ -132,20 +130,20 @@ class _NorekState extends State<Norek> {
                             children: <Widget>[
                               ListTile(
                                 title: new Text(
-                                  c[i]['nama_rekening'],
+                                  c[i]['rekening'],
                                   style: TextStyle(fontSize: 17),
                                 ),
-                                // trailing: Padding(
-                                //   padding: const EdgeInsets.only(top: 35.0),
-                                //   child: new Text(
-                                //     c[i].jumlah.toString(),
-                                //     style: TextStyle(fontSize: 20),
-                                //   ),
-                                // ),
-                                // subtitle: new Text(
-                                //   c[i].tanggal.toString(),
-                                //   style: TextStyle(fontSize: 12),
-                                // ),
+                                // onTap: (){
+                                //   Navigator.of(context).push(MaterialPageRoute<Null>(
+                                //     builder: (BuildContext context) {
+                                //       return new DetailRekening(
+                                //         snapshot.data[i]['data']['nama_perkiraan'],
+                                //         // snapshot.data[i]['rekening'],
+                                //       );
+                                //     }
+                                //     )
+                                //   );
+                                // },
                               ),
                             ],
                           ),

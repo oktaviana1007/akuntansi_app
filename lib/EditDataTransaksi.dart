@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:akuntansi_app/API.dart';
 import 'package:akuntansi_app/DataTransaksi.dart';
+import 'package:akuntansi_app/datatransaksi2.dart';
 import 'package:akuntansi_app/model/data.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -42,8 +43,8 @@ class _EditDataTransaksiState extends State<EditDataTransaksi> {
     });
   }
 
-  void submit() async{
-    var response = await http.post(BaseUrl.APIeditDataTransaksi, headers: {
+  void submit() async {
+    var response = await http.post(BaseUrl.editDataTransaksi, headers: {
       'Accept': 'application/json',
       'Authorization': 'Bearer $token'
     }, body: {
@@ -56,22 +57,23 @@ class _EditDataTransaksiState extends State<EditDataTransaksi> {
       "id": widget.list.id_transaksi.toString(),
     });
     final data = jsonDecode(response.body);
-        bool value = data['success'];
-        String message = data['message'];
-        if (value == true ) {
-          setState(() {
-            print(data);
-            // print(token);
-            // Navigator.pop(context);
-            // _lihatData();
-            tampilToast("Transaksi berhasil diedit");
-          });
-        } else {
-            // print(token);
-            tampilToast(message);
-          print("Gagal diedit");
-        }
-    
+    bool value = data['success'];
+    String message = data['message'];
+    if (value == true) {
+      setState(() {
+        Navigator.of(context).push(new MaterialPageRoute(
+            builder: (BuildContext context) => new DataTransaksi2()));
+        print(data);
+        // print(token);
+        // Navigator.pop(context);
+        // _lihatData();
+        tampilToast("Transaksi berhasil diedit");
+      });
+    } else {
+      // print(token);
+      tampilToast("Harap isi kembali semua field!");
+      // print("");
+    }
   }
 
   tampilToast(String toast) {
@@ -156,15 +158,15 @@ class _EditDataTransaksiState extends State<EditDataTransaksi> {
   // }
 
   final TextEditingController controllerDate = TextEditingController();
- 
+
   DateTime date;
 
   @override
   void initState() {
     // TODO: implement initState
-     jenis = widget.list.jenis_transaksi;
-     perki1 = widget.list.perkiraan1;
-     perki2 = widget.list.perkiraan2;
+    jenis = widget.list.jenis_transaksi;
+    perki1 = widget.list.perkiraan1;
+    perki2 = widget.list.perkiraan2;
     print("id : $perki1");
     // _valKredi = widget.list.perkiraan2_id;
     // _valPerki = widget.list.perkiraan1_id;
@@ -230,7 +232,10 @@ class _EditDataTransaksiState extends State<EditDataTransaksi> {
                                 const EdgeInsets.only(left: 20.0, right: 20),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton(
-                                hint: Text(jenis, style: TextStyle(color: Colors.black),),
+                                hint: Text(
+                                  jenis,
+                                  style: TextStyle(color: Colors.black),
+                                ),
                                 value: _valJenis,
                                 items: _dataJenis.map((item) {
                                   return DropdownMenuItem(
@@ -293,7 +298,8 @@ class _EditDataTransaksiState extends State<EditDataTransaksi> {
                                 //   ],
                                 // ),
                               ),
-                              style: TextStyle(fontSize: 16.0, color: Colors.blue),
+                              style:
+                                  TextStyle(fontSize: 16.0, color: Colors.blue),
                               readOnly: true,
                               onTap: () async {
                                 DateTime datePicker = await showDatePicker(
@@ -304,7 +310,7 @@ class _EditDataTransaksiState extends State<EditDataTransaksi> {
                                 );
                                 date = datePicker;
                                 controllerDate.text =
-                                      DateFormat('yyyy-MM-dd').format(date);
+                                    DateFormat('yyyy-MM-dd').format(date);
                               },
                             ),
                           ),
@@ -330,7 +336,10 @@ class _EditDataTransaksiState extends State<EditDataTransaksi> {
                                 const EdgeInsets.only(left: 20.0, right: 20),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton(
-                                hint: Text(perki2, style: TextStyle(color: Colors.black),),
+                                hint: Text(
+                                  perki2,
+                                  style: TextStyle(color: Colors.black),
+                                ),
                                 value: _valPerki,
                                 items: _dataPerki.map((item) {
                                   return DropdownMenuItem(
@@ -369,7 +378,10 @@ class _EditDataTransaksiState extends State<EditDataTransaksi> {
                                 const EdgeInsets.only(left: 20.0, right: 20),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton(
-                                hint: Text(perki1, style: TextStyle(color: Colors.black),),
+                                hint: Text(
+                                  perki1,
+                                  style: TextStyle(color: Colors.black),
+                                ),
                                 value: _valKredi,
                                 items: _dataKredi.map((item) {
                                   return DropdownMenuItem(
@@ -454,10 +466,6 @@ class _EditDataTransaksiState extends State<EditDataTransaksi> {
                                 child: new RaisedButton(
                                   onPressed: () {
                                     submit();
-                                    Navigator.of(context).push(
-                                        new MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                new DataTransaksi()));
                                   },
                                   textColor: Colors.white,
                                   child: Text(

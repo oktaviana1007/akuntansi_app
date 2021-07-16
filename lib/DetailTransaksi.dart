@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:akuntansi_app/API.dart';
 import 'package:akuntansi_app/DataTransaksi.dart';
+import 'package:akuntansi_app/datatransaksi2.dart';
 import 'package:akuntansi_app/model/data.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -52,7 +53,7 @@ class _DetailTransaksiState extends State<DetailTransaksi> {
             onPressed: () {
               deleteData();
               Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) => new DataTransaksi(),
+                builder: (BuildContext context) => new DataTransaksi2(),
               ));
             }),
         new RaisedButton(
@@ -65,11 +66,11 @@ class _DetailTransaksiState extends State<DetailTransaksi> {
         ),
       ],
     );
-    showDialog(context: context, child: alertDialog);
+    showDialog(context: context, builder: (context) => alertDialog);
   }
 
   void deleteData() async {
-     var response = await http.post(BaseUrl.APIhapusDataTransaksi, headers: {
+     var response = await http.post(BaseUrl.hapusDataTransaksi, headers: {
       'Accept': 'application/json',
       'Authorization': 'Bearer $token'
     }, body: {
@@ -88,7 +89,7 @@ class _DetailTransaksiState extends State<DetailTransaksi> {
             tampilToast(message);
           });
         } else {
-            // print(token);
+            // print(token);                                
           print("Gagal dihapus");
         }
   }

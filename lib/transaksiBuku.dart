@@ -90,7 +90,7 @@ class _TransaksiBukuState extends State<TransaksiBuku> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Transaksi Baru'),
         centerTitle: true,
@@ -371,7 +371,7 @@ class _TransaksiBukuState extends State<TransaksiBuku> {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) {
+        builder: (context) {
           return AlertDialog(
             title: new Text("Batal Membuat Transaksi"),
             content: new Text(

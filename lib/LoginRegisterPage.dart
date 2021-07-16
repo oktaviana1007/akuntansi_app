@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   String email, password;
   final _key = new GlobalKey<FormState>();
 
-  bool _secureText = true;
+  bool _secureText = true;  
 
   showHide() {
     setState(() {
@@ -48,30 +48,34 @@ class _LoginPageState extends State<LoginPage> {
         .post(BaseUrl.login, body: {"email": email, "password": password});
     final data = jsonDecode(response.body);
     print("data: $data");
-    int id = data['data']['id'];
-    String name = data['data']['name'];
-    String emailAPI = data['email'];
-    String nama_perusahaan = data['data']['nama_perusahaan'];
-    // String alamatPerusahaan = data['alamat_perusahaan'];
-    // String teleponPerusahaan = data['telepon_perusahaan'];
-    // String emailPerusahaan = data['email_perusahaan'];
-    String token = data['meta']['token'];
     bool success = data['success'];
+    // String messagge = data['message'];
+
+    print(success);
     if (success == true) {
       setState(() {
+        int id = data['data']['id'];
+        String name = data['data']['name'];
+        String emailAPI = data['data']['email'];
+        String nama_perusahaan = data['data']['nama_perusahaan'];
+        // String alamatPerusahaan = data['alamat_perusahaan'];
+        // String teleponPerusahaan = data['telepon_perusahaan'];
+        // String emailPerusahaan = data['email_perusahaan'];
+        String token = data['meta']['token'];
+
         _loginStatus = LoginStatus.signIn;
         savePref(id, name, emailAPI, success, token, nama_perusahaan);
       });
-      print("pesan");
       loginToast("LOGIN BERHASIL");
-    } if (success == false) {
+    }
+    if (success == false) {
       print("gatot");
       loginToast("Username/password tidak cocok");
     }
   }
 
-  savePref(
-      int id, String name, String email, bool success, String token, String nama_perusahaan) async {
+  savePref(int id, String name, String email, bool success, String token,
+      String nama_perusahaan) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       preferences.setInt("id", id);
@@ -142,7 +146,11 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.only(top: 50.0, right: 10.0),
-                    child: Image.asset('images/logoasli.png', width: 500, height: 200,),
+                    child: Image.asset(
+                      'images/logoasli.png',
+                      width: 500,
+                      height: 200,
+                    ),
                   ),
                 ],
               ),
@@ -194,7 +202,11 @@ class _LoginPageState extends State<LoginPage> {
                                     //card for Email TextFormField
                                     TextFormField(
                                       keyboardType: TextInputType.emailAddress,
-                                      validator: (e) {},
+                                      validator: (e) {
+                                        if (e.isEmpty) {
+                                          return "Email Tidak Dapat Kosong";
+                                        }
+                                      },
                                       onSaved: (e) => email = e,
                                       style: TextStyle(
                                         color: Colors.black,
@@ -263,13 +275,24 @@ class _LoginPageState extends State<LoginPage> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: <Widget>[
-                                        Text(
-                                          "Lupa kata sandi?",
-                                          style: TextStyle(
-                                              color: Colors.blue,
-                                              fontFamily: "Product-Bold",
-                                              fontSize: ScreenUtil.getInstance()
-                                                  .setSp(23)),
+                                        GestureDetector(
+                                          child: Text(
+                                            "Lupa kata sandi?",
+                                            style: TextStyle(
+                                                color: Colors.blue,
+                                                fontFamily: "Product-Bold",
+                                                fontSize:
+                                                    ScreenUtil.getInstance()
+                                                        .setSp(23)),
+                                          ),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ForgotPass()),
+                                            );
+                                          },
                                         )
                                       ],
                                     ),
@@ -313,14 +336,20 @@ class _LoginPageState extends State<LoginPage> {
                         padding: new EdgeInsets.only(top: 30.0),
                       ),
                       Container(
-                        height: 50,
+                        height: 90,
                         child: new FlatButton(
-                          child: Text('belum memiliki akun? DAFTAR SEKARANG',
-                              style: TextStyle(
-                                  fontSize: ScreenUtil.getInstance().setSp(25),
-                                  fontFamily: "Product-Bold",
-                                  color: Colors.blue,
-                                  letterSpacing: .6)),
+                          child: RichText(
+                            text: TextSpan(
+                                text: "Belum memiliki akun? ",
+                                style: TextStyle(color: Colors.black),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: 'Daftar sekarang!',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blue))
+                                ]),
+                          ),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -331,7 +360,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 40.0),
+                        padding: const EdgeInsets.only(top: 2.0),
                         child: Text(
                           "v1.0.0",
                           style: TextStyle(fontSize: 16.0, color: Colors.grey),
@@ -346,9 +375,147 @@ class _LoginPageState extends State<LoginPage> {
         );
         break;
       case LoginStatus.signIn:
-        return MenuUsers(signOut);
+        // return MenuUsers();
+        return Profil(signOut);
         break;
     }
+  }
+}
+
+class ForgotPass extends StatefulWidget {
+  @override
+  _ForgotPassState createState() => _ForgotPassState();
+}
+
+class _ForgotPassState extends State<ForgotPass> {
+  String email;
+
+  var key = GlobalKey<FormState>();
+
+  cek() {
+    final form = key.currentState;
+    if (form.validate()) {
+      form.save();
+      submit();
+    }
+  }
+
+  String url = "http://34.87.189.146:8000/api/password/email";
+
+  var loading = false;
+  submit() async {
+    setState(() {
+      loading = true;
+    });
+    final response = await http.post(url, body: {"email": email});
+    final data = jsonDecode(response.body);
+    print(data);
+    print(response.statusCode);
+    bool value = data['success'];
+    String message = data['Message'];
+    if (value == true) {
+      print(message);
+
+      setState(() {
+        showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+                  title: Text(message),
+                  actions: <Widget>[
+                    TextButton(
+                        child: Text('Kembali ke halaman login'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()),
+                          );
+                        }),
+                  ],
+                ),
+            barrierDismissible: false);
+        // Navigator.pop(context);
+        print(data);
+        // registerToast(pesan);
+      });
+    } else {
+      setState(() {
+        showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+                  title: Text("Maaf email anda tidak terdaftar"),
+                  actions: <Widget>[
+                    TextButton(
+                        child: Text('Kembali ke halaman login'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()),
+                          );
+                        }),
+                  ],
+                ),
+            barrierDismissible: false);
+        // Navigator.pop(context);
+        print(data);
+        // registerToast(pesan);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Lupa Kata Sandi"),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(5.0),
+        child: Form(
+          key: key,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Silahkan masukkan email akun anda"),
+              SizedBox(
+                height: 8.0,
+              ),
+              TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  onSaved: (e) => email = e,
+                  validator: (e) {
+                    if (e.isEmpty) {
+                      return "Silahkan input email anda";
+                    }
+                  }),
+              SizedBox(
+                height: 16.0,
+              ),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [Colors.orange, Colors.orange[900]])),
+                child: FlatButton(
+                  onPressed: () {
+                    cek();
+                  },
+                  child: Text(
+                    "submit",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -360,7 +527,6 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   String name, email, namap, alamatp, teleponp, emailp, password;
   final _key = new GlobalKey<FormState>();
-
 
   bool _secureText = true;
 
@@ -390,10 +556,6 @@ class _RegisterState extends State<Register> {
     }, body: {
       "name": name,
       "email": email,
-      "nama_perusahaan": namap,
-      "alamat_perusahaan": alamatp,
-      "telepon_perusahaan": teleponp,
-      "email_perusahaan": emailp,
       "password": password,
     });
 
@@ -401,10 +563,11 @@ class _RegisterState extends State<Register> {
     print(data);
     // Navigator.pop(context);
     // registerToast("REGISTER BERHASIL");
-    String meta = data['meta']['token'];
-    // int value = data['value'];
+    // String meta = data['meta']['token'];
+    bool value = data['success'];
     String pesan = data['message'];
-    if (meta == null) {
+    print(value);
+    if (value == false) {
       setState(() {
         print(data);
         Navigator.pop(context);
@@ -412,9 +575,26 @@ class _RegisterState extends State<Register> {
       });
     } else {
       setState(() {
-        Navigator.pop(context);
+        showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+                  title: Text(pesan),
+                  actions: <Widget>[
+                    TextButton(
+                        child: Text('Kembali ke halaman login'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()),
+                          );
+                        }),
+                  ],
+                ),
+            barrierDismissible: false);
+        // Navigator.pop(context);
         print(data);
-        registerToast("data");
+        // registerToast(pesan);
       });
     }
   }
@@ -438,15 +618,15 @@ class _RegisterState extends State<Register> {
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 30.0, right: 40.0),
-                //child: Image.asset('images/logo.png'),
-              ),
-            ],
-          ),
+          // Column(
+          //   crossAxisAlignment: CrossAxisAlignment.end,
+          //   children: <Widget>[
+          //     Padding(
+          //       padding: EdgeInsets.only(top: 30.0, right: 40.0),
+          //       //child: Image.asset('images/logo.png'),
+          //     ),
+          //   ],
+          // ),
           SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.only(left: 28.0, right: 28.0),
@@ -482,259 +662,135 @@ class _RegisterState extends State<Register> {
                                   fontSize: ScreenUtil.getInstance().setSp(40),
                                   fontFamily: "Product-Bold",
                                   letterSpacing: .6)),
-                          Form(
-                            key: _key,
-                            autovalidate: validate,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 15,
-                                ),
-                                TextFormField(
-                                  cursorColor: Color(0xff53C5CF),
-                                  validator: (e) {
-                                    if (e.isEmpty) {
-                                      return "Silakan Masukkan Nama Pengguna";
-                                    } else {
-                                      return null;
-                                    }
-                                  },
-                                  onSaved: (e) => name = e,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w300,
+                          SingleChildScrollView(
+                            child: Form(
+                              key: _key,
+                              autovalidate: validate,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 15,
                                   ),
-                                  decoration: InputDecoration(
-                                      // prefixIcon: Padding(
-                                      //   padding: EdgeInsets.only(
-                                      //       left: 20, right: 15),
-                                      //   child: Icon(
-                                      //     Icons.account_circle,
-                                      //   ),
-                                      // ),
-                                      // contentPadding: EdgeInsets.all(18),
-                                      labelText: "Nama Pengguna"),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(5.0),
-                                ),
-                                TextFormField(
-                                  cursorColor: Color(0xff53C5CF),
-                                  keyboardType: TextInputType.emailAddress,
-                                  validator: (e) {
-                                    if (e.isEmpty) {
-                                      return "Silakan Masukkan Email";
-                                    } else {
-                                      if (!e.contains("@")) {
-                                        return "Format Email Salah";
+                                  TextFormField(
+                                    cursorColor: Color(0xff53C5CF),
+                                    validator: (e) {
+                                      if (e.isEmpty) {
+                                        return "Silakan Masukkan Nama Pengguna";
                                       } else {
                                         return null;
                                       }
-                                    }
-                                  },
-                                  onSaved: (e) => email = e,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w300,
+                                    },
+                                    onSaved: (e) => name = e,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                    decoration: InputDecoration(
+                                        // prefixIcon: Padding(
+                                        //   padding: EdgeInsets.only(
+                                        //       left: 20, right: 15),
+                                        //   child: Icon(
+                                        //     Icons.account_circle,
+                                        //   ),
+                                        // ),
+                                        // contentPadding: EdgeInsets.all(18),
+                                        labelText: "Nama Pengguna"),
                                   ),
-                                  decoration: InputDecoration(
-                                      // prefixIcon: Padding(
-                                      //   padding: EdgeInsets.only(
-                                      //       left: 20, right: 15),
-                                      //   child: Icon(Icons.email),
-                                      // ),
-                                      // contentPadding: EdgeInsets.all(18),
-                                      labelText: "Email"),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(5.0),
-                                ),
-                                TextFormField(
-                                  cursorColor: Color(0xff53C5CF),
-                                  validator: (e) {
-                                    if (e.isEmpty) {
-                                      return "Silakan Masukkan Kata Sandi";
-                                    } else {
-                                      if (e.length < 8) {
-                                        return "Kata Sandi Minimum 8 Karakter";
+                                  Padding(
+                                    padding: EdgeInsets.all(5.0),
+                                  ),
+                                  TextFormField(
+                                    cursorColor: Color(0xff53C5CF),
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: (e) {
+                                      if (e.isEmpty) {
+                                        return "Silakan Masukkan Email";
                                       } else {
-                                        return null;
-                                      }
-                                    }
-                                  },
-                                  obscureText: _secureText,
-                                  onSaved: (e) => password = e,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                  decoration: InputDecoration(
-                                      suffixIcon: IconButton(
-                                        onPressed: showHide,
-                                        icon: Icon(_secureText
-                                            ? Icons.visibility_off
-                                            : Icons.visibility),
-                                      ),
-                                      // prefixIcon: Padding(
-                                      //   padding: EdgeInsets.only(
-                                      //       left: 20, right: 15),
-                                      //   child: Icon(Icons.phonelink_lock),
-                                      // ),
-                                      // contentPadding: EdgeInsets.all(18),
-                                      labelText: "Kata Sandi"),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(5.0),
-                                ),
-                                TextFormField(
-                                  cursorColor: Color(0xff53C5CF),
-                                  validator: (e) {
-                                    if (e.isEmpty) {
-                                      return "Silakan Masukkan Nama Perusahaan";
-                                    } else {
-                                      return null;
-                                    }
-                                  },
-                                  onSaved: (e) => namap = e,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                  decoration: InputDecoration(
-                                      // prefixIcon: Padding(
-                                      //   padding: EdgeInsets.only(
-                                      //       left: 20, right: 15),
-                                      //   child: Icon(
-                                      //     Icons.account_circle,
-                                      //   ),
-                                      // ),
-                                      // contentPadding: EdgeInsets.all(18),
-                                      labelText: "Nama Perusahaan"),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(5.0),
-                                ),
-                                TextFormField(
-                                  cursorColor: Color(0xff53C5CF),
-                                  validator: (e) {
-                                    if (e.isEmpty) {
-                                      return "Silakan Masukkan Nama Perusahaan";
-                                    } else {
-                                      return null;
-                                    }
-                                  },
-                                  onSaved: (e) => alamatp = e,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                  decoration: InputDecoration(
-                                      // prefixIcon: Padding(
-                                      //   padding: EdgeInsets.only(
-                                      //       left: 20, right: 15),
-                                      //   child: Icon(
-                                      //     Icons.account_circle,
-                                      //   ),
-                                      // ),
-                                      // contentPadding: EdgeInsets.all(18),
-                                      labelText: "Alamat Perusahaan"),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(5.0),
-                                ),
-                                TextFormField(
-                                  cursorColor: Color(0xff53C5CF),
-                                  keyboardType: TextInputType.emailAddress,
-                                  validator: (e) {
-                                    if (e.isEmpty) {
-                                      return "Silakan Masukkan Email";
-                                    } else {
-                                      if (!e.contains("@")) {
-                                        return "Format Email Salah";
-                                      } else {
-                                        return null;
-                                      }
-                                    }
-                                  },
-                                  onSaved: (e) => emailp = e,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                  decoration: InputDecoration(
-                                      // prefixIcon: Padding(
-                                      //   padding: EdgeInsets.only(
-                                      //       left: 20, right: 15),
-                                      //   child: Icon(Icons.email),
-                                      // ),
-                                      // contentPadding: EdgeInsets.all(18),
-                                      labelText: "Email Perusahaan"),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(5.0),
-                                ),
-                                TextFormField(
-                                  cursorColor: Color(0xff53C5CF),
-                                  validator: (e) {
-                                    if (e.isEmpty) {
-                                      return "Harap Masukkan Nomor Ponsel";
-                                    } else {
-                                      if (e.length < 11) {
-                                        return "Format Nomor Ponsel Salah";
-                                      } else {
-                                        if (e.length > 13) {
-                                          return "Format Nomor Ponsel Salah";
+                                        if (!e.contains("@")) {
+                                          return "Format Email Salah";
                                         } else {
                                           return null;
                                         }
                                       }
-                                    }
-                                  },
-                                  onSaved: (e) => teleponp = e,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w300,
+                                    },
+                                    onSaved: (e) => email = e,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                    decoration: InputDecoration(
+                                        // prefixIcon: Padding(
+                                        //   padding: EdgeInsets.only(
+                                        //       left: 20, right: 15),
+                                        //   child: Icon(Icons.email),
+                                        // ),
+                                        // contentPadding: EdgeInsets.all(18),
+                                        labelText: "Email"),
                                   ),
-                                  decoration: InputDecoration(
-                                    // prefixIcon: Padding(
-                                    //   padding: EdgeInsets.only(
-                                    //       left: 20, right: 15),
-                                    //   child: Icon(Icons.phone),
-                                    // ),
-                                    // contentPadding: EdgeInsets.all(18),
-                                    labelText: "Nomor Perusahaan",
+                                  Padding(
+                                    padding: EdgeInsets.all(5.0),
                                   ),
-                                  keyboardType: TextInputType.number,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(20.0),
-                                ),
-                                Container(
-                                  height: 50,
-                                  width: 150,
-                                  child: ButtonTheme(
-                                    minWidth: MediaQuery.of(context).size.width,
-                                    child: new Container(
-                                      child: RaisedButton(
-                                          child: Text(
-                                            "Daftar",
-                                            style: TextStyle(fontSize: 15.0),
-                                          ),
-                                          onPressed: () {
-                                            check();
-                                          }),
+                                  TextFormField(
+                                    cursorColor: Color(0xff53C5CF),
+                                    validator: (e) {
+                                      if (e.isEmpty) {
+                                        return "Silakan Masukkan Kata Sandi";
+                                      } else {
+                                        if (e.length < 8) {
+                                          return "Kata Sandi Minimum 8 Karakter";
+                                        } else {
+                                          return null;
+                                        }
+                                      }
+                                    },
+                                    obscureText: _secureText,
+                                    onSaved: (e) => password = e,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                    decoration: InputDecoration(
+                                        suffixIcon: IconButton(
+                                          onPressed: showHide,
+                                          icon: Icon(_secureText
+                                              ? Icons.visibility_off
+                                              : Icons.visibility),
+                                        ),
+                                        // prefixIcon: Padding(
+                                        //   padding: EdgeInsets.only(
+                                        //       left: 20, right: 15),
+                                        //   child: Icon(Icons.phonelink_lock),
+                                        // ),
+                                        // contentPadding: EdgeInsets.all(18),
+                                        labelText: "Kata Sandi"),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(20.0),
+                                  ),
+                                  Container(
+                                    height: 50,
+                                    width: 150,
+                                    child: ButtonTheme(
+                                      minWidth:
+                                          MediaQuery.of(context).size.width,
+                                      child: new Container(
+                                        child: RaisedButton(
+                                            child: Text(
+                                              "Daftar",
+                                              style: TextStyle(fontSize: 15.0),
+                                            ),
+                                            onPressed: () {
+                                              check();
+                                            }),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ],

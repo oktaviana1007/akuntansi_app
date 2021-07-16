@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
 // import 'package:akuntansi2/modal/filter.dart';
 // import 'package:akuntansi2/modal/filterPerkiraan.dart';
+import 'package:dio/dio.dart';
+import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BukuBesar extends StatefulWidget {
@@ -17,7 +21,20 @@ class _BukuBesarState extends State<BukuBesar> {
   String kira;
   setup() async {
     var tgl = new DateTime.now();
+    var thn = tgl.year;
     var bln = tgl.month;
+    if (thn == 2020){
+      year = "2020";
+    }
+    if (thn == 2021) {
+      year = "2021";
+    }
+    if (thn == 2022) {
+      year = "2022";
+    }
+    if (thn == 2023) {
+      year = "2023";
+    }
     if (bln == 1) {
       month = "January";
     }
@@ -55,7 +72,7 @@ class _BukuBesarState extends State<BukuBesar> {
       month = "December";
     }
     // month = "September";
-    year = "2020";
+    // year = "2020";
     kira = "Kas";
   }
 
@@ -74,9 +91,9 @@ class _BukuBesarState extends State<BukuBesar> {
     "December"
   ];
 
-  List listYear = ["2018", "2019", "2020"];
+  List listYear = ["2018", "2019", "2020", "2021","2022", "2023"];
 
-  List listPerkiraan = [
+  List listPerkiraan = [ 
     "Kas",
     "Bank",
     "Perlengkapan",
@@ -142,6 +159,47 @@ class _BukuBesarState extends State<BukuBesar> {
     return jsonData;
   }
 
+   final imgUrl = "http://34.87.189.146:8000/api/bukubesar/pdf";
+  var dio = Dio();
+
+   void getPermission()async{
+    print("get permission");
+    await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+  }
+
+  Future download(Dio dio, String url, String savePath)async{
+    try{
+      Response response = await dio.post(url, data: {"month" : "$month", "year": "$year", "nama_perkiraan":"$kira"}, onReceiveProgress: showDownloadProgress,
+      options: Options(
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }, 
+        responseType: ResponseType.bytes,
+        followRedirects: false,
+        validateStatus: (status){
+          return status < 500;
+        }),
+      );
+        // File file = File(savePath);
+      File file = File(savePath);
+      var raf = file.openSync (mode: FileMode.write);
+      raf.writeFromSync(response.data);
+      await raf.close();
+      // showDialog(context: context, builder: (context) => Text("Jurnal berhasil di download"));
+    }catch(e){
+      print("eror is");
+      print(e);
+    }
+  }
+
+  void showDownloadProgress(received, total){
+    if(total != -1){
+      print((received/total*100).toStringAsFixed(0)+"%");
+      // loginToast("Jurnal berhasil diunduh");
+    }
+  }
+
   @override
   void initState() {
     super.initState;
@@ -156,6 +214,16 @@ class _BukuBesarState extends State<BukuBesar> {
         appBar: AppBar(
           title: Text("Buku Besar"),
           centerTitle: true,
+           actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.file_download, color: Colors.white),
+            onPressed: ()async {
+              String path = await ExtStorage.getExternalStoragePublicDirectory(ExtStorage.DIRECTORY_DOWNLOADS);
+              String fullpath = "$path/Buku Besar ${kira} ${month} ${year}.pdf";
+              download(dio, imgUrl, fullpath);
+            },
+          )
+        ],
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,

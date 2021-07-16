@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:akuntansi_app/API.dart';
 import 'package:akuntansi_app/DataTransaksi.dart';
+import 'package:akuntansi_app/datatransaksi2.dart';
 import 'package:akuntansi_app/Pengaturan.dart';
 import 'package:akuntansi_app/custom/datepicker.dart';
 import 'package:akuntansi_app/model/jenisTransaksi.dart';
@@ -132,7 +133,7 @@ class _TambahDataTransaksiState extends State<TambahDataTransaksi> {
   }
 
   void save() async {
-    final response = await http.post(BaseUrl.APItambahDataTransaksi, headers: {
+    final response = await http.post(BaseUrl.tambahDataTransaksi, headers: {
       'Accept': 'application/json',
       'Authorization': 'Bearer $token'
     }, body: {
@@ -153,13 +154,17 @@ class _TambahDataTransaksiState extends State<TambahDataTransaksi> {
       setState(() {
         // widget.reload();
         // Navigator.pop(context);
+
+        Navigator.of(context).push(new MaterialPageRoute(
+          builder: (BuildContext context) => DataTransaksi2(),
+        ));
         print(data);
         tampilToast("Data Berhasil Ditambahkan");
       });
     } else {
       print(data);
       print(response.statusCode);
-      tampilToast("Data GAGAL Ditambahkan");
+      tampilToast("Data GAGAL Ditambahkan, isi semua field");
     }
   }
 
@@ -485,11 +490,6 @@ class _TambahDataTransaksiState extends State<TambahDataTransaksi> {
                                   child: new RaisedButton(
                                     onPressed: () {
                                       check();
-                                      Navigator.of(context)
-                                          .push(new MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            DataTransaksi(),
-                                      ));
                                     },
                                     child: Text(
                                       "SIMPAN",
@@ -518,7 +518,7 @@ class _TambahDataTransaksiState extends State<TambahDataTransaksi> {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) {
+        builder: (context) {
           return AlertDialog(
             title: new Text("Batal Membuat Transaksi"),
             content: new Text(

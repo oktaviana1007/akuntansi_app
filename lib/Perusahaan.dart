@@ -113,7 +113,7 @@ class PerusahaanState extends State<Perusahaan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           'Pengaturan',
@@ -174,7 +174,9 @@ class PerusahaanState extends State<Perusahaan> {
                                 child: const Text('UBAH'),
                                 onPressed: () {
                                   showDialog(
-                                      child: new AlertDialog(
+                                    context: context,
+                                    builder: ( BuildContext context) { 
+                                      return AlertDialog(
                                         title: Text("Ubah Data"),
                                         content: SingleChildScrollView(
                                             child: ListBody(
@@ -247,8 +249,7 @@ class PerusahaanState extends State<Perusahaan> {
                                             )
                                           ],
                                         )),
-                                      ),
-                                      context: context);
+                                      );});
                                 },
                               ),
                             ],

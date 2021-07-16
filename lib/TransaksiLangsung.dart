@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:akuntansi_app/API.dart';
 import 'package:akuntansi_app/DataTransaksi.dart';
+import 'package:akuntansi_app/datatransaksi2.dart';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -370,7 +372,7 @@ class _TambahDataTransaksiwState extends State<TambahDataTransaksiw> {
                                 onPressed: () {
                                   check();
                                   Navigator.of(context).push(new MaterialPageRoute(
-                                    builder: (BuildContext context) => new DataTransaksi(),
+                                    builder: (BuildContext context) => new DataTransaksi2(),
                                   )
                                   );
                                 },
@@ -400,7 +402,7 @@ class _TambahDataTransaksiwState extends State<TambahDataTransaksiw> {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) {
+        builder: (context) {
           return AlertDialog(
             title: new Text("Batal Membuat Transaksi"),
             content: new Text(
@@ -411,7 +413,7 @@ class _TambahDataTransaksiwState extends State<TambahDataTransaksiw> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DataTransaksi(),
+                      builder: (context) => DataTransaksi2(),
                     ),
                   );
                 },

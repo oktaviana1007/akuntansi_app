@@ -9,14 +9,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Profil extends StatefulWidget {
   // Profil({Key key}) : super(key: key);
-  // final VoidCallback signOut;
-  // Profil(this.signOut);
+  final VoidCallback signOut;
+  Profil(this.signOut);
 
   @override
   ProfilState createState() => ProfilState();
 }
 
 class ProfilState extends State<Profil> {
+  
   String name;
   String perusahaan;
   String alamat;
@@ -62,11 +63,21 @@ class ProfilState extends State<Profil> {
       "telepon_perusahaan": "$telepon_perusahaan",
       "email_perusahaan": "$email_perusahaan"
     });
-    // print(data.statusCode);
+    print(data.statusCode);
     var jsonData = json.decode(data.body);
-    // print(jsonData);
+        savePref(nama_perusahaan);
+
+    print(jsonData);
 
     return jsonData;
+  }
+
+  savePref( String nama_perusahaan) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      preferences.setString("nama_perusahaan", nama_perusahaan);
+      preferences.commit();
+    });
   }
 
   TextEditingController _nameController,
@@ -82,47 +93,47 @@ class ProfilState extends State<Profil> {
     emailpctrl = TextEditingController(text: emailp);
   }
 
-  // signOut(){
-  //   setState(() {
-  //     widget.signOut();
-  //   });
-  // }
-  // _confirmResult(bool isYes, BuildContext context){
-  //   if(isYes){
-  //     widget.signOut();
-  //     Navigator.pop(context);
-  //   }else{
-  //     Navigator.pop(context);
-  //   }
-  // }
+  signOut(){
+    setState(() {
+      widget.signOut();
+    });
+  }
+  _confirmResult(bool isYes, BuildContext context){
+    if(isYes){
+      widget.signOut();
+      Navigator.pop(context);
+    }else{
+      Navigator.pop(context);
+    }
+  }
 
-  // dialog() {
-  //   return showDialog(
-  //       context: context,
-  //       barrierDismissible: true,
-  //       builder: (BuildContext context) {
-  //         return AlertDialog(
-  //           title: Text("KELUAR"),
-  //           content: SingleChildScrollView(
-  //             child: ListBody(
-  //               children: <Widget>[
-  //                 Text("Apakah anda yakin untuk keluar dari akun anda?")
-  //               ],
-  //             ),
-  //           ),
-  //           actions: <Widget>[
-  //             FlatButton(
-  //               onPressed: ()=> _confirmResult(true, context),
-  //               child: Text("Ya"),
-  //             ),
-  //             FlatButton(
-  //               onPressed: ()=> _confirmResult(false, context),
-  //               child: Text("Tidak"),
-  //             )
-  //           ],
-  //         );
-  //       });
-  // }
+  dialog() {
+    return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("KELUAR"),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text("Apakah anda yakin untuk keluar dari akun anda?")
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: ()=> _confirmResult(true, context),
+                child: Text("Ya"),
+              ),
+              FlatButton(
+                onPressed: ()=> _confirmResult(false, context),
+                child: Text("Tidak"),
+              )
+            ],
+          );
+        });
+  }
 
   @override
   void initState() {
@@ -134,7 +145,7 @@ class ProfilState extends State<Profil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           'PROFILE',
@@ -167,76 +178,84 @@ class ProfilState extends State<Profil> {
                         trailing: Icon(Icons.edit),
                         onTap: () {
                           showDialog(
-                              child: new AlertDialog(
-                                title: Text("Ubah Data"),
-                                content: SingleChildScrollView(
-                                    child: ListBody(
-                                  children: <Widget>[
-                                    new Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 10.0, top: 0.0),
-                                    ),
-                                    TextFormField(
-                                      decoration: InputDecoration(
-                                        labelText: "Nama",
-                                      ),
-                                      controller: _nameController,
-                                    ),
-                                    TextFormField(
-                                      decoration: InputDecoration(
-                                          labelText: "Nama Perusahaan"),
-                                      controller: perusahaanctrl,
-                                    ),
-                                    TextFormField(
-                                      decoration: InputDecoration(
-                                          labelText: "Alamat Perusahaan"),
-                                      controller: alamatctrl,
-                                    ),
-                                    TextFormField(
-                                      decoration: InputDecoration(
-                                          labelText: "Telepon Perusahaan"),
-                                      keyboardType: TextInputType.phone,
-                                      controller: teleponctrl,
-                                    ),
-                                    TextFormField(
-                                      decoration: InputDecoration(
-                                          labelText: "Email Perusahaan"),
-                                      keyboardType: TextInputType.emailAddress,
-                                      controller: emailpctrl,
-                                    ),
-                                    new Padding(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Ubah Data"),
+                                  content: SingleChildScrollView(
+                                      child: ListBody(
+                                    children: <Widget>[
+                                      new Padding(
                                         padding: EdgeInsets.only(
-                                            top: 10.0,
-                                            left: 20.0,
-                                            right: 20.0)),
-                                    new RaisedButton(
-                                      color: Colors.blue,
-                                      child: new Text("Simpan",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: "Product-Bold",
-                                              fontSize: 18,
-                                              letterSpacing: 1.0)),
-                                      onPressed: () {
-                                        updateData(
-                                            snapshot.data['data']['id']
-                                                .toString(),
-                                            _nameController.text,
-                                            perusahaanctrl.text,
-                                            alamatctrl.text,
-                                            teleponctrl.text,
-                                            emailpctrl.text);
-                                        setState(() {
-                                          Navigator.of(context,
-                                                  rootNavigator: true)
-                                              .pop();
-                                        });
-                                      },
-                                    )
-                                  ],
-                                )),
-                              ),
-                              context: context);
+                                            left: 10.0, top: 0.0),
+                                      ),
+                                      TextFormField(
+                                        decoration: InputDecoration(
+                                          labelText: "Nama",
+                                        ),
+                                        controller: _nameController,
+                                      ),
+                                      TextFormField(
+                                        decoration: InputDecoration(
+                                            labelText: "Nama Perusahaan"),
+                                        controller: perusahaanctrl,
+                                      ),
+                                      TextFormField(
+                                        decoration: InputDecoration(
+                                            labelText: "Alamat Perusahaan"),
+                                        controller: alamatctrl,
+                                      ),
+                                      TextFormField(
+                                        decoration: InputDecoration(
+                                            labelText: "Telepon Perusahaan"),
+                                        keyboardType: TextInputType.phone,
+                                        controller: teleponctrl,
+                                      ),
+                                      TextFormField(
+                                        decoration: InputDecoration(
+                                            labelText: "Email Perusahaan"),
+                                        keyboardType:
+                                            TextInputType.emailAddress,
+                                        controller: emailpctrl,
+                                      ),
+                                      new Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 10.0,
+                                              left: 20.0,
+                                              right: 20.0)),
+                                      new RaisedButton(
+                                        color: Colors.blue,
+                                        child: new Text("Simpan",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: "Product-Bold",
+                                                fontSize: 18,
+                                                letterSpacing: 1.0)),
+                                        onPressed: () {
+                                          updateData(
+                                              snapshot.data['data']['id']
+                                                  .toString(),
+                                              _nameController.text,
+                                              perusahaanctrl.text,
+                                              alamatctrl.text,
+                                              teleponctrl.text,
+                                              emailpctrl.text);
+                                          setState(() {
+                                            Navigator.of(context)
+                                                .push(new MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  Profil(signOut),
+                                            ));
+                                            // Navigator.of(context,
+                                            //         rootNavigator: true)
+                                            //     .pop();
+                                          });
+                                        },
+                                      )
+                                    ],
+                                  )),
+                                );
+                              });
                           // Navigator.push(
                           //   context,
                           //   MaterialPageRoute(
@@ -307,7 +326,7 @@ class ProfilState extends State<Profil> {
                       leading: Icon(Icons.logout),
                       onTap: () {
                         setState(() {
-                          // dialog();
+                          dialog();
                         });
                       },
                     )

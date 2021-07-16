@@ -29,33 +29,15 @@ class _MenuUsersState extends State<MenuUsers> {
     }
   }
 
-  dialog() {
-    return showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("KELUAR"),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  Text("Apakah anda yakin untuk keluar dari akun anda?")
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: ()=> _confirmResult(true, context),
-                child: Text("Ya"),
-              ),
-              FlatButton(
-                onPressed: ()=> _confirmResult(false, context),
-                child: Text("Tidak"),
-              )
-            ],
-          );
-        });
-  }
+  // showDialog(
+  //   context:context,
+  //   builder: (BuildContext context){
+  //     return Dialog(
+        
+  //     )
+  //   }
+  // ),
+
 
   @override
   void initState() {
@@ -75,9 +57,14 @@ class _MenuUsersState extends State<MenuUsers> {
           actions: <Widget>[
             IconButton(
               onPressed: (){
-                setState(() {
-                  dialog();
-                });
+                signOut();  
+                // showDialog(
+                //   context: context,
+                //   builder: (BuildContext context){
+
+                //     // signOut();
+                //   }
+                // );
               },
               icon: Icon(Icons.power_settings_new),
             )

@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +20,19 @@ class _NeracaSaldoState extends State<NeracaSaldo> {
   setup() async {
     var tgl = new DateTime.now();
     var bln = tgl.month;
+    var thn = tgl.year;
+    if (thn == 2020) {
+      year = "2020";
+    }
+    if (thn == 2021) {
+      year = "2021";
+    }
+    if (thn == 2022) {
+      year = "2022";
+    }
+    if (thn == 2023) {
+      year = "2023";
+    }
     if (bln == 1) {
       month = "January";
     }
@@ -52,7 +70,7 @@ class _NeracaSaldoState extends State<NeracaSaldo> {
       month = "December";
     }
     // month = "September";
-    year = "2020";
+    // year = "2020";
   }
 
   List listMonth = [
@@ -70,7 +88,7 @@ class _NeracaSaldoState extends State<NeracaSaldo> {
     "December"
   ];
 
-  List listYear = ["2018", "2019", "2020"];
+  List listYear = ["2018", "2019", "2020", "2021", "2022", "2023"];
 
   String token;
   getPref() async {
@@ -101,6 +119,50 @@ class _NeracaSaldoState extends State<NeracaSaldo> {
     print(jsonData);
     print(data.statusCode);
     return jsonData;
+  }
+
+  final imgUrl = "http://34.87.189.146:8000/api/neracasaldo/pdf";
+  var dio = Dio();
+
+  void getPermission() async {
+    print("get permission");
+    await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+  }
+
+  Future download(Dio dio, String url, String savePath) async {
+    try {
+      Response response = await dio.post(
+        url,
+        data: {"month": "$month", "year": "$year"},
+        onReceiveProgress: showDownloadProgress,
+        options: Options(
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token'
+            },
+            responseType: ResponseType.bytes,
+            followRedirects: false,
+            validateStatus: (status) {
+              return status < 500;
+            }),
+      );
+      // File file = File(savePath);
+      File file = File(savePath);
+      var raf = file.openSync(mode: FileMode.write);
+      raf.writeFromSync(response.data);
+      await raf.close();
+      // showDialog(context: context, builder: (context) => Text("Jurnal berhasil di download"));
+    } catch (e) {
+      print("eror is");
+      print(e);
+    }
+  }
+
+  void showDownloadProgress(received, total) {
+    if (total != -1) {
+      print((received / total * 100).toStringAsFixed(0) + "%");
+      // loginToast("Jurnal berhasil diunduh");
+    }
   }
 
   @override
@@ -147,6 +209,17 @@ class _NeracaSaldoState extends State<NeracaSaldo> {
       appBar: AppBar(
         title: Text("Neraca Saldo"),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.file_download, color: Colors.white),
+            onPressed: () async {
+              String path = await ExtStorage.getExternalStoragePublicDirectory(
+                  ExtStorage.DIRECTORY_DOWNLOADS);
+              String fullpath = "$path/Neraca Saldo ${month} ${year}.pdf";
+              download(dio, imgUrl, fullpath);
+            },
+          )
+        ],
       ),
       body: Container(
         padding: EdgeInsets.only(left: 20, right: 20),
@@ -295,12 +368,11 @@ class _NeracaSaldoState extends State<NeracaSaldo> {
             FutureBuilder(
               future: getData(month, year),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
-                 if (snapshot.connectionState != ConnectionState.done)
-                    return Center(child: CircularProgressIndicator());
-                  if (!snapshot.hasData || snapshot.data == null)
-                    return Container();
-                  if (snapshot.data.isEmpty)
-                    return Container();
+                if (snapshot.connectionState != ConnectionState.done)
+                  return Center(child: CircularProgressIndicator());
+                if (!snapshot.hasData || snapshot.data == null)
+                  return Container();
+                if (snapshot.data.isEmpty) return Container();
                 if (snapshot.hasData) {
                   a = snapshot.data['data'][month];
                   return SingleChildScrollView(
@@ -355,7 +427,8 @@ class _NeracaSaldoState extends State<NeracaSaldo> {
                                       Column(
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 8.0, left: 8, right: 20),
+                                            padding: const EdgeInsets.only(
+                                                top: 8.0, left: 8, right: 20),
                                             child: Container(
                                               alignment: Alignment.bottomRight,
                                               child: Text((a[index]['tipe'])

@@ -1,5 +1,6 @@
 import 'package:akuntansi_app/DataTransaksi.dart';
 import 'package:akuntansi_app/Pengaturan.dart';
+import 'package:akuntansi_app/datatransaksi2.dart';
 import 'package:akuntansi_app/laporan.dart';
 import 'package:akuntansi_app/kalkulator.dart';
 import 'package:akuntansi_app/perusahaan.dart';
@@ -9,22 +10,23 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainDrawer extends StatefulWidget {
+  
   @override
   _MainDrawerState createState() => _MainDrawerState();
 }
 
-// enum LoginStatus { notSignIn, signIn, signInAdmin }
+enum LoginStatus { notSignIn, signIn, signInAdmin }
 class _MainDrawerState extends State<MainDrawer> {
-// LoginStatus _loginStatus = LoginStatus.notSignIn;
-// signOut() async {
-//     SharedPreferences preferences = await SharedPreferences.getInstance();
-//     setState(() {
-//       preferences.setInt("value", null);
-//       preferences.setString("level", null);
-//       preferences.commit();
-//       _loginStatus = LoginStatus.notSignIn;
-//     });
-//   }
+LoginStatus _loginStatus = LoginStatus.notSignIn;
+signOut() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      preferences.setInt("value", null);
+      preferences.setString("level", null);
+      preferences.commit();
+      _loginStatus = LoginStatus.notSignIn;
+    });
+  }
   String namaPerusahaan;
   getPref() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -33,6 +35,8 @@ class _MainDrawerState extends State<MainDrawer> {
     });
     print("nama: $namaPerusahaan");
   }
+
+  
 
   @override
   void initState() {
@@ -57,25 +61,22 @@ class _MainDrawerState extends State<MainDrawer> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => Profil()),
+                    MaterialPageRoute(builder: (context) => Profil(signOut)),
                   );
                 },
-                child: Material(
-                  borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  elevation: 10,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      height: 70,
-                      width: 70,
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                                "https://png.pngtree.com/png-clipart/20190614/original/pngtree-vector-shop-icon-png-image_3788233.jpg"),
-                      ),
-                    )
-                        // Image.asset('images/logo.png', width: 70, height: 70),
-                  ),
-                ),
+                child: CircleAvatar(
+                    radius: 50,
+                    backgroundImage: AssetImage('images/gambar.jpg'),
+                )
+                // child: Material(
+                //   borderRadius: BorderRadius.all(Radius.circular(70.0)),
+                //   elevation: 10,
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(8.0),
+                //     child: 
+                //          Image.asset('images/gambar.jpg', width: 70, height: 70),
+                //   ),
+                // ),
               ),
               Expanded(
                 child: Padding(
@@ -103,7 +104,7 @@ class _MainDrawerState extends State<MainDrawer> {
         CustomListTile(FontAwesomeIcons.handHoldingUsd, 'Transaksi', () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => DataTransaksi()),
+            MaterialPageRoute(builder: (context) => DataTransaksi2()),
           );
         }),
         Divider(

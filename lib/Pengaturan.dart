@@ -1,6 +1,7 @@
 import 'package:akuntansi_app/API.dart';
 import 'package:akuntansi_app/LoginRegisterPage.dart';
 import 'package:akuntansi_app/Norek.dart';
+import 'package:akuntansi_app/korek.dart';
 import 'package:akuntansi_app/mainDrawer.dart';
 import 'package:akuntansi_app/perusahaan.dart';
 import 'package:akuntansi_app/profil.dart';
@@ -16,8 +17,23 @@ class Pengaturan extends StatefulWidget {
   @override
   PengaturanState createState() => PengaturanState();
 }
-
+enum LoginStatus{
+  notSignIn,
+  signIn,
+}
 class PengaturanState extends State<Pengaturan> {
+  LoginStatus _loginStatus = LoginStatus.notSignIn;
+   
+   signOut() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      preferences.setBool("success", false);
+      // preferences.setString("level", null);
+      preferences.commit();
+      _loginStatus = LoginStatus.notSignIn;
+    });
+  }
+
   String name;
   String perusahaan;
   String alamat;
@@ -26,6 +42,7 @@ class PengaturanState extends State<Pengaturan> {
   String token;
   int id;
   String email, password;
+  var value;
 
   bool _secureText = true;
 
@@ -41,6 +58,10 @@ class PengaturanState extends State<Pengaturan> {
       token = preferences.getString("token");
       id = preferences.getInt("id");
       print("data : $id");
+       value = preferences.getBool("success");
+      _loginStatus = value == true
+          ? LoginStatus.signIn
+          :  LoginStatus.notSignIn;
     });
   }
 
@@ -89,7 +110,8 @@ class PengaturanState extends State<Pengaturan> {
   }
 
   void confirm() {
-    AlertDialog alertDialog = new AlertDialog(
+    showDialog(context: context, builder: (BuildContext context){
+       return AlertDialog(
       title: Text("Input email dan password akun"),
       content: Stack(
         overflow: Overflow.visible,
@@ -181,7 +203,12 @@ class PengaturanState extends State<Pengaturan> {
         ),
       ],
     );
-    showDialog(context: context, child: alertDialog);
+    });
+   
+    // showDialog(context: context, builder: (BuildContext context){
+    //   Container(child: alertDialog);
+    // });
+    // showDialog(context: context, child: alertDialog);
   }
 
   @override
@@ -208,13 +235,13 @@ class PengaturanState extends State<Pengaturan> {
             CustomListTile('Perusahaan', 'Edit data perusahaan', () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Profil()),
+                MaterialPageRoute(builder: (context) => Profil(signOut)),
               );
             }),
-            CustomListTile("No Rekening", 'Edit data no rekening', () {
+            CustomListTile("Kode Rekening", 'Edit data kode rekening', () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Norek()),
+                MaterialPageRoute(builder: (context) => Korek()),
               );
             }),
             CustomListTile(

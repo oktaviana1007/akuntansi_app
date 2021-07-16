@@ -1,5 +1,10 @@
 // import 'package:akuntansi2/modal/filter.dart';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -17,6 +22,19 @@ class NeracaState extends State<Neraca> {
   setup() async {
     var tgl = new DateTime.now();
     var bln = tgl.month;
+    var thn = tgl.year;
+    if (thn == 2020){
+      year = "2020";
+    }
+    if (thn == 2021) {
+      year = "2021";
+    }
+    if (thn == 2022) {
+      year = "2022";
+    }
+    if (thn == 2023) {
+      year = "2023";
+    }
     if (bln == 1) {
       month = "January";
     }
@@ -54,7 +72,7 @@ class NeracaState extends State<Neraca> {
       month = "December";
     }
     // month = "September";
-    year = "2020";
+    // year = "2020";
   }
 
    List listMonth= [
@@ -72,11 +90,8 @@ class NeracaState extends State<Neraca> {
     "December"
   ];
 
-  List listYear=[
-    "2018",
-    "2019",
-    "2020"
-  ];
+  List listYear = ["2018", "2019", "2020", "2021","2022", "2023"];
+
 
   String token;
   getPref() async {
@@ -87,13 +102,10 @@ class NeracaState extends State<Neraca> {
     });
   }
 
-   var a;
+  var a;
   var b;
-Future getData(String month, String year) async{
-  // final prefs = await SharedPreferences.getInstance();
-  //   final key = 'api_token';
-  //   final value = prefs.get(key) ?? 0;
-  //   print(value);
+
+  Future getData(String month, String year) async{
   String apiURL = "http://34.87.189.146:8000/api/report/neraca/view";
   var data= await http.post(apiURL,
   headers: {
@@ -112,12 +124,56 @@ Future getData(String month, String year) async{
   return jsonData;
 }
 
+
+  final imgUrl = "http://34.87.189.146:8000/api/neraca/pdf";
+  var dio = Dio();
+
+   void getPermission()async{
+    print("get permission");
+    await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+  }
+  
+
   @override
   void initState(){
     super.initState;
     setup();
     getData(month,year);
     getPref();
+    getPermission();
+  }
+
+  Future download(Dio dio, String url, String savePath)async{
+    try{
+      Response response = await dio.post(url, data: {"month" : "$month", "year": "$year"}, onReceiveProgress: showDownloadProgress,
+      options: Options(
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }, 
+        responseType: ResponseType.bytes,
+        followRedirects: false,
+        validateStatus: (status){
+          return status < 500;
+        }),
+      );
+        // File file = File(savePath);
+      File file = File(savePath);
+      var raf = file.openSync (mode: FileMode.write);
+      raf.writeFromSync(response.data);
+      await raf.close();
+      // showDialog(context: context, builder: (context) => Text("Jurnal berhasil di download"));
+    }catch(e){
+      print("eror is");
+      print(e);
+    }
+  }
+
+  void showDownloadProgress(received, total){
+    if(total != -1){
+      print((received/total*100).toStringAsFixed(0)+"%");
+      // loginToast("Jurnal berhasil diunduh");
+    }
   }
 
   @override
@@ -126,6 +182,16 @@ Future getData(String month, String year) async{
       appBar: AppBar(
         title: Text("Neraca"),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.file_download, color: Colors.white),
+            onPressed: ()async {
+              String path = await ExtStorage.getExternalStoragePublicDirectory(ExtStorage.DIRECTORY_DOWNLOADS);
+              String fullpath = "$path/Neraca ${month} ${year}.pdf";
+              download(dio, imgUrl, fullpath);
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child:Container(
